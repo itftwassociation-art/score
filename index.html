@@ -209,6 +209,10 @@
 
   /* ---------- results view ---------- */
   #results { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-bottom: 12px; }
+  .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .toolbar:empty { display: none; }
+  .toolbar .msg { font-size: 13px; font-weight: 700; color: var(--muted); }
+  #clear.confirm, #resetp.confirm { background: var(--fg); color: var(--bg); border-color: var(--fg); }
   .bouts { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
   .bouts .lbl { font-size: 13px; font-weight: 700; color: var(--muted); }
   .bout {
@@ -315,16 +319,6 @@
 </div>
 
 <div class="bar-ctrl" id="ctrl">
-  <div class="field"><span>場地<span class="en">Court</span></span>
-    <div class="seg" id="court-seg" role="group" aria-label="場地 Court">
-      <button type="button" data-court="I" aria-pressed="false">I</button>
-      <button type="button" data-court="II" aria-pressed="false">II</button>
-      <button type="button" data-court="III" aria-pressed="false">III</button>
-      <button type="button" data-court="IV" aria-pressed="false">IV</button>
-      <button type="button" data-court="V" aria-pressed="false">V</button>
-      <button type="button" data-court="VI" aria-pressed="false">VI</button>
-    </div>
-  </div>
   <div class="field"><span>裁判<span class="en">Judge</span></span>
     <div class="seg" id="judge-seg" role="group" aria-label="裁判編號 Judge number">
       <button type="button" data-slot="1" aria-pressed="false">1</button>
@@ -344,6 +338,7 @@
   </div>
   <button class="btn st" id="next" type="button"></button>
   <div class="result" id="result" hidden aria-live="polite"></div>
+  <button class="btn st" id="resetp" type="button"></button>
   <button class="btn st" id="reset" type="button"></button>
 </div>
 
@@ -438,6 +433,7 @@
 </main>
 
 <section id="results" hidden aria-label="五位裁判結果 Five-judge results">
+  <div class="toolbar"><button class="btn st" id="clear" type="button" hidden></button><span class="msg" id="clear-msg" aria-live="polite"></span></div>
   <div class="bouts" id="courts"></div>
   <div class="cards" id="cards"></div>
   <div class="bouts" id="bouts"></div>
@@ -453,7 +449,7 @@
 (function () {
   var KEY = 'itf-tul-scoreboard-v3';
   var JKEY = 'itf-tul-judge-v1';
-  var COURTS = ['I', 'II', 'III', 'IV', 'V', 'VI'];
+  var COURTS = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6'];
   var MAX_D = 30;   // 6.0 / 0.2
   var MAX_A = 8;    // 4.0 / 0.5
   // Scores are tenths of a point (integers) to avoid floating-point drift.
@@ -465,7 +461,7 @@
   var S = fresh();
   var J = { slot: 0, name: '', court: '' };
 
-  var db = null, uid = null, canWrite = true, net = 'idle', errCode = '', syncing = false;
+  var db = null, uid = null, isAdmin = false, clearing = false, canWrite = true, net = 'idle', errCode = '', syncing = false;
   var ENT = [], LOG = [], selKey = null, selCourt = 'all', curCourt = 'all', view = 'score';
 
   var $ = function (id) { return document.getElementById(id); };
@@ -505,7 +501,7 @@
     if (sj) {
       J.slot = Math.max(0, Math.min(5, sj.slot | 0));
       J.name = typeof sj.name === 'string' ? sj.name.slice(0, 20) : '';
-      J.court = COURTS.indexOf(sj.court) >= 0 ? sj.court : '';
+      J.court = '';
     }
   } catch (e) {}
   function persist() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
@@ -573,9 +569,9 @@
     });
     var jb = $('judge-seg').querySelectorAll('button');
     for (var i = 0; i < jb.length; i++) jb[i].setAttribute('aria-pressed', String(+jb[i].getAttribute('data-slot') === J.slot));
-    var cb = $('court-seg').querySelectorAll('button');
-    for (var k = 0; k < cb.length; k++) cb[k].setAttribute('aria-pressed', String(cb[k].getAttribute('data-court') === J.court));
-    if (!resetBtn.classList.contains('confirm')) setSt(resetBtn, '新一回合', 'New round');
+    if (!resetBtn.classList.contains('confirm')) setSt(resetBtn, '重置整回合', 'Reset round');
+    resetpBtn.hidden = st === 3;
+    if (!resetpBtn.classList.contains('confirm')) setSt(resetpBtn, '重置本套', 'Reset pattern');
   }
 
   function renderInputs() {
@@ -589,7 +585,6 @@
   function pending() { return S.stage >= 2 && (!S.sent[1] || (S.stage >= 3 && !S.sent[2])); }
   function missing() {
     var m = [];
-    if (!J.court) m.push('場地 Court');
     if (!J.slot) m.push('裁判 Judge');
     if (!idPart(S.redNo)) m.push('紅方編號 Red No.');
     if (!idPart(S.blueNo)) m.push('藍方編號 Blue No.');
@@ -629,7 +624,7 @@
           S.sent[k] = true; persist();
         }
       }
-      await db.doc('entries/' + idPart(J.court) + '_' + rn + '_' + bn + '_j' + J.slot).set({
+      await db.doc('entries/' + rn + '_' + bn + '_j' + J.slot).set({
         court: J.court, red: String(S.redNo).trim(), blue: String(S.blueNo).trim(), slot: J.slot, judge: J.name, uid: uid || '',
         r1: score(S.red.e[0]), r2: S.stage >= 3 ? score(S.red.e[1]) : null,
         b1: score(S.blue.e[0]), b2: S.stage >= 3 ? score(S.blue.e[1]) : null,
@@ -672,8 +667,8 @@
   var resetBtn = $('reset'), resetTimer = null;
   resetBtn.addEventListener('click', function () {
     if (!resetBtn.classList.contains('confirm')) {
-      resetBtn.classList.add('confirm'); setSt(resetBtn, '再按一次確認', 'Tap again to confirm');
-      resetTimer = setTimeout(function () { resetBtn.classList.remove('confirm'); setSt(resetBtn, '新一回合', 'New round'); }, 3000);
+      resetBtn.classList.add('confirm'); setSt(resetBtn, '再按一次確認重置', 'Tap again to reset');
+      resetTimer = setTimeout(function () { resetBtn.classList.remove('confirm'); setSt(resetBtn, '重置整回合', 'Reset round'); }, 3000);
       return;
     }
     clearTimeout(resetTimer);
@@ -682,12 +677,22 @@
     persist(); renderInputs(); renderAll(true);
   });
 
-  /* ---------- events: court, judge, contestant fields ---------- */
-  $('court-seg').addEventListener('click', function (ev) {
-    var b = ev.target.closest('button[data-court]');
-    if (!b) return;
-    J.court = b.getAttribute('data-court'); persistJ(); renderCtrl(); renderStatus(); sync();
+  var resetpBtn = $('resetp'), resetpTimer = null;
+  resetpBtn.addEventListener('click', function () {
+    if (S.stage === 3) return;
+    if (!resetpBtn.classList.contains('confirm')) {
+      resetpBtn.classList.add('confirm'); setSt(resetpBtn, '再按一次確認', 'Tap again to confirm');
+      resetpTimer = setTimeout(function () { resetpBtn.classList.remove('confirm'); setSt(resetpBtn, '重置本套', 'Reset pattern'); }, 3000);
+      return;
+    }
+    clearTimeout(resetpTimer);
+    resetpBtn.classList.remove('confirm');
+    var i = curIdx();
+    S.red.e[i] = entry(); S.blue.e[i] = entry();
+    vib(); persist(); renderAll(true);
   });
+
+  /* ---------- events: court, judge, contestant fields ---------- */
   $('judge-seg').addEventListener('click', function (ev) {
     var b = ev.target.closest('button[data-slot]');
     if (!b) return;
@@ -766,7 +771,51 @@
     return { cls: side, zh: zh, en: en, zs: zs, es: es };
   }
 
-  function renderResults() {
+  function renderClear() {
+    var b = $('clear');
+    b.hidden = !(db && isAdmin);
+    if (clearing || b.classList.contains('confirm')) return;
+    if (curCourt === 'all') setSt(b, '清除全部結果', 'Clear all results');
+    else setSt(b, '清除' + courtZh(curCourt) + '結果', 'Clear ' + courtEn(curCourt) + ' results');
+  }
+  var clearTimer = null;
+  $('clear').addEventListener('click', async function () {
+    var b = $('clear');
+    if (clearing || !db) return;
+    if (!b.classList.contains('confirm')) {
+      b.classList.add('confirm'); setSt(b, '再按一次確認清除', 'Tap again to clear');
+      clearTimer = setTimeout(function () { b.classList.remove('confirm'); renderClear(); }, 4000);
+      return;
+    }
+    clearTimeout(clearTimer); b.classList.remove('confirm');
+    clearing = true; setSt(b, '清除中…', 'Clearing…');
+    var msg = $('clear-msg'), court = curCourt, n = 0;
+    msg.textContent = '';
+    try {
+      var names = ['entries', 'log'];
+      for (var k = 0; k < names.length; k++) {
+        for (var round = 0; round < 40; round++) {
+          var snap = await db.collection(names[k]).limit(1000).get();
+          var docs = snap.docs.filter(function (d) {
+            if (court === 'all') return true;
+            var x = d.data() || {};
+            return String(x.court == null ? '' : x.court) === court;
+          });
+          if (!docs.length) break;
+          for (var i = 0; i < docs.length; i++) { await db.doc(names[k] + '/' + docs[i].id).delete(); n++; }
+        }
+      }
+      msg.textContent = '已清除 ' + n + ' 筆 · Cleared ' + n + ' entr' + (n === 1 ? 'y' : 'ies');
+    } catch (e) {
+      msg.textContent = '清除失敗 Clear failed' + (e && e.code ? '(' + e.code + ')' : '');
+    } finally {
+      clearing = false; renderClear();
+    }
+  });
+
+  function renderResults() { renderResultsInner(); renderClear(); }
+
+  function renderResultsInner() {
     var courtsEl = $('courts'), boutsEl = $('bouts'), cardsEl = $('cards'), banner = $('banner'), wrap = $('tbl-wrap');
     courtsEl.textContent = ''; boutsEl.textContent = ''; cardsEl.textContent = ''; wrap.textContent = ''; banner.textContent = '';
     courtsEl.hidden = true; boutsEl.hidden = true; cardsEl.hidden = true; wrap.hidden = true; banner.hidden = false;
@@ -931,6 +980,7 @@
         var u = await window.claude.use('user');
         if (u) {
           uid = await u.id();
+          isAdmin = (await u.canEdit()) || (await u.isOwner());
           var w = await u.can('data.write');
           if (w === false) canWrite = false;
         }
