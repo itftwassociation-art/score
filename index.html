@@ -51,6 +51,7 @@
     color-scheme: dark;
   }
 
+  [hidden] { display: none !important; }
   * { box-sizing: border-box; }
   html, body { height: 100%; }
   body {
@@ -76,16 +77,18 @@
   .st .en { display: block; margin: 0; }
 
   /* ---------- top bar ---------- */
-  .bar-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .bar-top { display: flex; align-items: center; gap: 6px 8px; flex-wrap: wrap; }
   .bar-top h1 {
-    margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 26px;
-    letter-spacing: .06em; text-transform: uppercase; line-height: 1; white-space: nowrap;
+    margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 22px;
+    letter-spacing: .05em; text-transform: uppercase; line-height: 1; white-space: nowrap;
   }
-  .bar-top h1 span { font-family: var(--font-body); font-size: 14px; letter-spacing: .04em; margin-left: 8px; color: var(--muted); font-weight: 500; text-transform: none; }
+  .bar-top h1 span { font-family: var(--font-body); font-size: 12px; letter-spacing: .02em; margin-left: 6px; color: var(--muted); font-weight: 500; text-transform: none; }
+  @media (max-width: 640px) { .bar-top h1 span { display: none; } }
   .tabs { display: flex; border: 2px solid var(--line); border-radius: 8px; overflow: hidden; }
-  .tabs button { background: transparent; padding: 4px 16px; min-height: 44px; font-size: 15px; font-weight: 700; color: var(--muted); }
+  .tabs button { background: transparent; padding: 0 12px; min-height: 36px; font-size: 13px; font-weight: 700; color: var(--muted); white-space: nowrap; }
   .tabs button[aria-selected="true"] { background: var(--fg); color: var(--bg); }
-  .sync { margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; min-width: 0; }
+  .sync { flex: 1 1 90px; min-width: 0; display: flex; align-items: center; justify-content: flex-end; gap: 6px; font-size: 12px; font-weight: 700; }
+  #sync-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .sync .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); flex: none; }
   .sync[data-k="ok"] .dot { background: var(--ok); }
   .sync[data-k="warn"] .dot, .sync[data-k="busy"] .dot { background: var(--warn); }
@@ -96,118 +99,126 @@
   .sync[data-k="idle"], .sync[data-k="off"] { color: var(--muted); }
 
   .btn {
-    min-height: 44px; padding: 0 14px; border-radius: 8px; background: transparent;
-    border: 2px solid var(--line); color: var(--fg); font-weight: 700; font-size: 14px;
+    min-height: 36px; padding: 0 10px; border-radius: 8px; background: transparent;
+    border: 2px solid var(--line); color: var(--fg); font-weight: 700; font-size: 13px; white-space: nowrap;
   }
   .btn:disabled { opacity: .35; cursor: not-allowed; }
-  .btn.mini { min-height: 30px; padding: 0 10px; font-size: 13px; }
-  #next { min-height: 48px; padding: 0 18px; font-size: 16px; background: var(--fg); color: var(--bg); border-color: var(--fg); }
-  #reset.confirm { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+  .btn.mini { min-height: 28px; padding: 0 8px; font-size: 12px; flex: none; }
+  #next, #finish { min-height: 38px; padding: 0 14px; font-size: 14px; background: var(--fg); color: var(--bg); border-color: var(--fg); }
+  #reset.confirm, #resetp.confirm, #clear.confirm { background: var(--fg); color: var(--bg); border-color: var(--fg); }
 
-  /* ---------- court / judge / stage row ---------- */
-  .bar-ctrl { display: flex; align-items: center; gap: 8px 14px; flex-wrap: wrap; }
-  .field { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: var(--muted); }
+  /* ---------- judge row ---------- */
+  .bar-ctrl { display: flex; align-items: center; gap: 6px 10px; flex-wrap: wrap; }
+  .field { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--muted); white-space: nowrap; }
   .field input {
-    min-height: 40px; width: 9em; max-width: 100%; padding: 0 10px; border-radius: 8px;
-    border: 2px solid var(--line); background: var(--surface); color: var(--fg); font: 700 16px var(--font-body);
+    min-height: 38px; width: 7.5em; max-width: 100%; padding: 0 10px; border-radius: 8px;
+    border: 2px solid var(--line); background: var(--surface); color: var(--fg); font: 700 14px var(--font-body);
   }
-  .seg { display: flex; gap: 4px; }
+  .seg { display: flex; gap: 3px; }
   .seg button {
-    min-width: 40px; padding: 0 8px; min-height: 40px; border-radius: 8px; background: transparent;
-    border: 2px solid var(--line); color: var(--fg); font: 700 17px var(--font-display);
+    min-width: 38px; padding: 0 6px; min-height: 38px; border-radius: 8px; background: transparent;
+    border: 2px solid var(--line); color: var(--fg); font: 700 16px var(--font-display);
   }
   .seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
-  .grow { flex: 1 1 8px; }
-  .stage { display: flex; border: 2px solid var(--line); border-radius: 8px; overflow: hidden; }
-  .stage span { padding: 4px 12px; font-size: 14px; font-weight: 700; color: var(--muted); }
-  .stage span.done { color: var(--fg); }
-  .stage span.on { background: var(--fg); color: var(--bg); }
-  .result { font-weight: 700; font-size: 15px; padding: 7px 14px; border-radius: 8px; color: #fff; font-variant-numeric: tabular-nums; }
+  @media (max-width: 900px) { #reset .en, #resetp .en { display: none; } }
+  .grow { flex: 1 1 4px; }
+  .stage { display: none; }
+  .result { font-weight: 700; font-size: 13px; padding: 5px 10px; border-radius: 8px; color: #fff; font-variant-numeric: tabular-nums; white-space: nowrap; }
   .result.red { background: var(--red); }
   .result.blue { background: var(--blue); }
   .result.tie { background: var(--fg); color: var(--bg); }
 
-  /* ---------- scoring board ---------- */
+  /* ---------- scoring board (fits one screen) ---------- */
   main {
-    flex: 1; min-height: 0; overflow-y: auto; display: grid; gap: 10px;
+    flex: 1; min-height: 0; overflow: hidden; display: grid; gap: 8px;
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: repeat(2, minmax(380px, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
   }
   @media (min-aspect-ratio: 5/4) {
-    main { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: minmax(340px, 1fr); }
+    main { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); }
   }
   .panel {
-    --side: var(--red); background: var(--side); color: var(--ink); border-radius: 14px; padding: 12px;
-    display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: 10px;
-    container-type: size; min-width: 0; position: relative;
+    --side: var(--red); background: var(--side); color: var(--ink); border-radius: 12px; padding: 8px;
+    display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: 6px;
+    container-type: size; min-width: 0; min-height: 0; overflow: hidden; position: relative;
   }
   .panel.blue { --side: var(--blue); }
   .panel.win { box-shadow: inset 0 0 0 4px #fff; }
 
-  .head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-  .who { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-  .chip-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .head { display: flex; justify-content: space-between; align-items: center; gap: 6px; min-width: 0; }
+  .who { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .chip-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
   .chip {
-    display: inline-flex; align-items: baseline; gap: 6px; background: rgba(0,0,0,.28);
-    border-radius: 6px; padding: 4px 12px; font-weight: 700; font-size: 20px;
+    display: inline-flex; align-items: baseline; gap: 4px; background: rgba(0,0,0,.28);
+    border-radius: 6px; padding: 2px 8px; font-weight: 700; font-size: 16px; white-space: nowrap;
   }
-  .chip .en { font-family: var(--font-display); letter-spacing: .1em; font-size: 15px; }
-  .num { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; }
+  .chip .en { font-family: var(--font-display); letter-spacing: .08em; font-size: 12px; }
+  .num { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; white-space: nowrap; }
   .num input {
-    width: 5.2em; min-height: 36px; border-radius: 6px; border: 2px solid rgba(255,255,255,.75);
-    background: rgba(0,0,0,.22); color: #fff; font: 700 20px var(--font-display); text-align: center; padding: 0 6px;
+    width: 4em; min-height: 30px; border-radius: 6px; border: 2px solid rgba(255,255,255,.75);
+    background: rgba(0,0,0,.22); color: #fff; font: 700 17px var(--font-display); text-align: center; padding: 0 4px;
   }
   .num input::placeholder { color: rgba(255,255,255,.6); }
-  .tag { background: #fff; color: #111; font-weight: 700; font-size: 13px; padding: 3px 8px; border-radius: 6px; }
-  .tag.win { font-size: 15px; padding: 3px 10px; }
+  .tag { background: #fff; color: #111; font-weight: 700; font-size: 12px; padding: 2px 6px; border-radius: 6px; white-space: nowrap; }
+  .tag.win { font-size: 13px; padding: 2px 8px; }
 
-  .sum { display: flex; gap: 6px; }
-  .cell { background: rgba(0,0,0,.22); border-radius: 6px; padding: 3px 8px; min-width: 0; text-align: center; }
-  .cell small { display: block; font-size: 11px; font-weight: 500; opacity: .92; white-space: nowrap; }
-  .cell small .en { font-size: 1em; margin-left: .3em; }
-  .cell b { display: block; font-family: var(--font-display); font-size: 22px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .sum { display: flex; gap: 4px; }
+  .cell { background: rgba(0,0,0,.22); border-radius: 6px; padding: 1px 6px; min-width: 0; text-align: center; }
+  .cell small { display: block; font-size: 10px; font-weight: 500; opacity: .92; white-space: nowrap; }
+  .cell small .en { font-size: 1em; margin-left: .25em; }
+  .cell b { display: block; font-family: var(--font-display); font-size: 17px; line-height: 1.1; font-variant-numeric: tabular-nums; }
   .cell.cur { outline: 2px solid rgba(255,255,255,.85); }
   .cell.sumc { background: #fff; color: var(--side); }
 
-  .tot-wrap { text-align: right; }
-  .tot-label { font-size: 12px; font-weight: 700; letter-spacing: .04em; opacity: .95; margin-bottom: 2px; }
+  .tot-wrap { text-align: right; min-width: 0; }
+  .tot-label { font-size: 10px; font-weight: 700; letter-spacing: .02em; opacity: .95; white-space: nowrap; }
   .tot-label .en { font-size: 1em; }
   .total {
-    font-family: var(--font-display); font-weight: 700; font-size: 17vmin; font-size: min(20cqh, 28cqw);
-    line-height: .86; font-variant-numeric: tabular-nums; text-align: right; letter-spacing: .01em;
+    font-family: var(--font-display); font-weight: 700; font-size: 17vmin; font-size: min(24cqh, 26cqw);
+    line-height: .86; font-variant-numeric: tabular-nums; text-align: right;
   }
   .total.bump { animation: bump .22s ease-out; }
-  @keyframes bump { 0% { transform: scale(1.12); } 100% { transform: scale(1); } }
+  @keyframes bump { 0% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
-  .phases { display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; min-height: 0; }
-  .phase { display: flex; flex-direction: column; gap: 6px; min-height: 0; min-width: 0; }
-  .ph-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 6px; }
-  .ph-label { font-weight: 700; font-size: 14px; line-height: 1.15; min-width: 0; }
-  .ph-label .en { font-size: .85em; }
-  .ph-label small { display: block; font-weight: 500; font-size: 12px; opacity: .88; }
-  .ph-read { font-family: var(--font-display); font-weight: 700; font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .ph-read small { font-size: 16px; opacity: .8; font-weight: 600; }
-  .meter { height: 6px; border-radius: 3px; background: rgba(0,0,0,.3); overflow: hidden; flex: none; }
+  .phases { display: grid; grid-template-columns: 1.4fr 1fr; gap: 8px; min-height: 0; }
+  .phase { display: flex; flex-direction: column; gap: 4px; min-height: 0; min-width: 0; }
+  .ph-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 4px; min-width: 0; }
+  .ph-label { font-weight: 700; font-size: 12px; line-height: 1.1; min-width: 0; }
+  .ph-label .en { font-size: .85em; margin-left: .25em; }
+  .ph-label small { display: block; font-weight: 500; font-size: 11px; opacity: .88; }
+  .ph-read { font-family: var(--font-display); font-weight: 700; font-size: 22px; line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .ph-read small { font-size: 12px; opacity: .8; font-weight: 600; }
+  .meter { height: 4px; border-radius: 2px; background: rgba(0,0,0,.3); overflow: hidden; flex: none; }
   .meter b { display: block; height: 100%; background: #fff; width: 100%; transition: width .15s; }
 
   .big {
-    flex: 1; min-height: 56px; border-radius: 12px; font-family: var(--font-display); font-weight: 700;
+    flex: 1; min-height: 40px; border-radius: 10px; font-family: var(--font-display); font-weight: 700;
     line-height: 1; font-variant-numeric: tabular-nums; transition: transform .06s;
   }
   .big:active:not(:disabled) { transform: scale(.97); }
   .big:disabled { opacity: .35; cursor: not-allowed; }
-  .big.deduct { background: #fff; color: var(--side); font-size: 16vmin; font-size: clamp(44px, 22cqh, 110px); }
-  .big.add { background: rgba(0,0,0,.32); color: #fff; border: 2px solid rgba(255,255,255,.7); font-size: 11vmin; font-size: clamp(34px, 14cqh, 72px); }
+  .big.deduct { background: #fff; color: var(--side); font-size: 16vmin; font-size: clamp(34px, 20cqh, 96px); }
+  .big.add { background: rgba(0,0,0,.32); color: #fff; border: 2px solid rgba(255,255,255,.7); font-size: 11vmin; font-size: clamp(26px, 12cqh, 60px); }
 
-  .foot { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .small { min-height: 50px; border-radius: 10px; background: rgba(0,0,0,.3); color: #fff; font-weight: 700; font-size: 16px; }
-  .small .en { font-size: .75em; }
+  .foot { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .small { min-height: 40px; border-radius: 10px; background: rgba(0,0,0,.3); color: #fff; font-weight: 700; font-size: 14px; padding: 0 4px; }
+  .small .en { font-size: .72em; }
   .small:disabled { opacity: .35; cursor: not-allowed; }
   .small.zero.on { background: #fff; color: var(--side); }
+  @container (max-width: 340px) {
+    .chip .en, .num > span .en { display: none; }
+    .chip-row { flex-wrap: nowrap; }
+  }
+  @container (max-height: 270px) {
+    .ph-label .en, .tot-label { display: none; }
+    .ph-label small { display: inline; margin-left: .35em; }
+    .big { min-height: 30px; }
+    .small { min-height: 34px; }
+  }
   .panel.zeroed .phases { opacity: .45; }
   .panel.locked .phases, .panel.locked .foot { opacity: .5; }
 
-  /* ---------- results view ---------- */
+/* ---------- results view ---------- */
   #results { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-bottom: 12px; }
   .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
   .toolbar:empty { display: none; }
@@ -275,17 +286,6 @@
   .log-wrap th { background: var(--surface); color: var(--muted); position: sticky; top: 0; }
   .log-wrap td { font-size: 14px; padding: 6px 10px; }
 
-  @media (max-height: 460px) {
-    body { gap: 5px; padding-block: 4px; }
-    .bar-top h1 { font-size: 20px; }
-    .tabs button { min-height: 38px; }
-    .btn, .field input, .seg button { min-height: 36px; }
-    #next { min-height: 40px; }
-    .stage span { padding: 2px 10px; }
-    .panel { padding: 8px; gap: 6px; }
-    .small { min-height: 42px; }
-    .cell b { font-size: 18px; }
-  }
   /* Side-by-side: blue panel is the left-right mirror of the red panel */
   @media (min-aspect-ratio: 5/4) {
     .panel.blue .head { flex-direction: row-reverse; }
@@ -309,13 +309,15 @@
 <div class="bar-top">
   <h1>ITF TUL<span>計分板 Scoreboard</span></h1>
   <div class="tabs" role="tablist" aria-label="畫面 View">
-    <button type="button" role="tab" id="tab-score" class="st" aria-selected="true"><span>計分</span><span class="en">Scoring</span></button>
-    <button type="button" role="tab" id="tab-results" class="st" aria-selected="false"><span>結果</span><span class="en">Results</span></button>
+    <button type="button" role="tab" id="tab-score" aria-selected="true"><span>計分</span><span class="en">Scoring</span></button>
+    <button type="button" role="tab" id="tab-results" aria-selected="false"><span>結果</span><span class="en">Results</span></button>
   </div>
   <div class="sync" id="sync" data-k="idle" aria-live="polite">
     <span class="dot"></span><span id="sync-text">完成第1套後自動回傳 Auto-sends after Pattern 1</span>
     <button class="btn mini" id="retry" type="button" hidden>傳送 Send</button>
   </div>
+  <button class="btn" id="resetp" type="button"></button>
+  <button class="btn" id="reset" type="button"></button>
 </div>
 
 <div class="bar-ctrl" id="ctrl">
@@ -328,18 +330,16 @@
       <button type="button" data-slot="5" aria-pressed="false">5</button>
     </div>
   </div>
-  <label class="field"><span>姓名<span class="en">Name</span></span> <input id="jname" type="text" placeholder="姓名 Name" maxlength="20" autocomplete="off"></label>
+  <label class="field"><input id="jname" type="text" placeholder="姓名 Name" maxlength="20" autocomplete="off"></label>
   <span class="grow"></span>
-  <button class="btn st" id="back" type="button" hidden></button>
+  <button class="btn" id="back" type="button" hidden></button>
   <div class="stage" aria-label="進行階段 Progress">
     <span class="st" id="st1"><span>第1套</span><span class="en">Pattern 1</span></span>
     <span class="st" id="st2"><span>第2套</span><span class="en">Pattern 2</span></span>
     <span class="st" id="st3"><span>結果</span><span class="en">Result</span></span>
   </div>
-  <button class="btn st" id="next" type="button"></button>
+  <button class="btn" id="next" type="button"></button>
   <div class="result" id="result" hidden aria-live="polite"></div>
-  <button class="btn st" id="resetp" type="button"></button>
-  <button class="btn st" id="reset" type="button"></button>
 </div>
 
 <main id="board">
@@ -366,7 +366,7 @@
     <div class="phases">
       <div class="phase">
         <div class="ph-head">
-          <div class="ph-label">① 準確度<span class="en">Accuracy</span><small id="red-dn">已扣 0 次 · 0 deductions</small></div>
+          <div class="ph-label">① 準確度<span class="en">Accuracy</span><small id="red-dn">−0.2 × 0</small></div>
           <div class="ph-read"><span id="red-p1">6.0</span><small>/6.0</small></div>
         </div>
         <div class="meter"><b id="red-m1"></b></div>
@@ -374,7 +374,7 @@
       </div>
       <div class="phase">
         <div class="ph-head">
-          <div class="ph-label">② 表現<span class="en">Performance</span><small id="red-an">已加 0 次 · 0 additions</small></div>
+          <div class="ph-label">② 表現<span class="en">Performance</span><small id="red-an">+0.5 × 0</small></div>
           <div class="ph-read"><span id="red-p2">0.0</span><small>/4.0</small></div>
         </div>
         <div class="meter"><b id="red-m2"></b></div>
@@ -410,7 +410,7 @@
     <div class="phases">
       <div class="phase">
         <div class="ph-head">
-          <div class="ph-label">① 準確度<span class="en">Accuracy</span><small id="blue-dn">已扣 0 次 · 0 deductions</small></div>
+          <div class="ph-label">① 準確度<span class="en">Accuracy</span><small id="blue-dn">−0.2 × 0</small></div>
           <div class="ph-read"><span id="blue-p1">6.0</span><small>/6.0</small></div>
         </div>
         <div class="meter"><b id="blue-m1"></b></div>
@@ -418,7 +418,7 @@
       </div>
       <div class="phase">
         <div class="ph-head">
-          <div class="ph-label">② 表現<span class="en">Performance</span><small id="blue-an">已加 0 次 · 0 additions</small></div>
+          <div class="ph-label">② 表現<span class="en">Performance</span><small id="blue-an">+0.5 × 0</small></div>
           <div class="ph-read"><span id="blue-p2">0.0</span><small>/4.0</small></div>
         </div>
         <div class="meter"><b id="blue-m2"></b></div>
@@ -433,7 +433,7 @@
 </main>
 
 <section id="results" hidden aria-label="五位裁判結果 Five-judge results">
-  <div class="toolbar"><button class="btn st" id="clear" type="button" hidden></button><span class="msg" id="clear-msg" aria-live="polite"></span></div>
+  <div class="toolbar"><button class="btn" id="clear" type="button" hidden></button><span class="msg" id="clear-msg" aria-live="polite"></span></div>
   <div class="bouts" id="courts"></div>
   <div class="cards" id="cards"></div>
   <div class="bouts" id="bouts"></div>
@@ -529,8 +529,8 @@
     $(side + '-p2').textContent = fmt(p2);
     $(side + '-m1').style.width = (p1 / 60 * 100) + '%';
     $(side + '-m2').style.width = (p2 / 40 * 100) + '%';
-    $(side + '-dn').textContent = '已扣 ' + e.d + ' 次 · ' + e.d + ' deduction' + (e.d === 1 ? '' : 's');
-    $(side + '-an').textContent = '已加 ' + e.a + ' 次 · ' + e.a + ' addition' + (e.a === 1 ? '' : 's');
+    $(side + '-dn').textContent = '−0.2 × ' + e.d;
+    $(side + '-an').textContent = '+0.5 × ' + e.a;
     $(side + '-ded').disabled = locked || e.z || e.d >= MAX_D;
     $(side + '-add').disabled = locked || e.z || e.a >= MAX_A;
     $(side + '-undo').disabled = locked || e.z || e.h.length === 0;
@@ -602,6 +602,7 @@
     else { msg = miss.length ? '請先填 Fill first: ' + miss.join('、') : '完成第1套後自動回傳 Auto-sends after Pattern 1'; }
     $('sync').setAttribute('data-k', k);
     $('sync-text').textContent = msg;
+    $('sync').title = msg;
     $('retry').hidden = !(db && canWrite && p && net !== 'sending');
   }
 
