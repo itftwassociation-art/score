@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>ITF TUL 計分板</title>
+<title>ITF TUL Scoreboard</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -253,6 +253,8 @@
     .small { min-height: 34px; }
     .small .en { display: none; }
   }
+  @container (max-width: 340px) { .ph-label small { display: none; } .ph-label { font-size: 11px; } }
+  @container (max-width: 300px) { .ph-read small { display: none; } .ph-label { font-size: 9.5px; letter-spacing: -.01em; } .ph-read { font-size: 15px; } }
 
 /* ---------- results view ---------- */
   #results { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-bottom: 12px; }
@@ -343,8 +345,8 @@
 </style>
 
 <div class="bar-top">
-  <div class="field"><span>裁判<span class="en">Judge</span></span>
-    <div class="seg" id="judge-seg" role="group" aria-label="裁判編號 Judge number">
+  <div class="field"><span>Judge</span>
+    <div class="seg" id="judge-seg" role="group" aria-label="Judge number">
       <button type="button" data-slot="1" aria-pressed="false">1</button>
       <button type="button" data-slot="2" aria-pressed="false">2</button>
       <button type="button" data-slot="3" aria-pressed="false">3</button>
@@ -352,60 +354,60 @@
       <button type="button" data-slot="5" aria-pressed="false">5</button>
     </div>
   </div>
-  <label class="field"><input id="jname" type="text" placeholder="裁判姓名 Judge name" maxlength="20" autocomplete="off" aria-label="裁判姓名 Judge name"></label>
+  <label class="field"><input id="jname" type="text" placeholder="Judge name" maxlength="20" autocomplete="off" aria-label="Judge name"></label>
   <h1>ITF TUL</h1>
   <span class="grow"></span>
-  <div class="tabs" role="tablist" aria-label="畫面 View">
-    <button type="button" role="tab" id="tab-score" aria-selected="true">計分<span class="en">Scoring</span></button>
-    <button type="button" role="tab" id="tab-results" aria-selected="false">結果<span class="en">Results</span></button>
+  <div class="tabs" role="tablist" aria-label="View">
+    <button type="button" role="tab" id="tab-score" aria-selected="true">Scoring</button>
+    <button type="button" role="tab" id="tab-results" aria-selected="false">Results</button>
   </div>
   <div class="sync" id="sync" data-k="idle" aria-live="polite">
-    <span class="dot"></span><span id="sync-text">完成第1套後自動回傳 Auto-sends after Pattern 1</span>
-    <button class="btn mini" id="retry" type="button" hidden>傳送 Send</button>
+    <span class="dot"></span><span id="sync-text">Auto-sends after Pattern 1</span>
+    <button class="btn mini" id="retry" type="button" hidden>Send</button>
   </div>
 </div>
 
 <main id="board">
-  <section class="panel red" data-side="red" aria-label="紅方 Red">
+  <section class="panel red" data-side="red" aria-label="Red">
     <div class="head">
       <div class="who">
         <div class="chip-row">
-          <span class="chip">紅方<span class="en">Red</span></span>
-          <label class="num"><span>編號<span class="en">No.</span></span> <input id="red-no" type="text" inputmode="numeric" maxlength="8" placeholder="#" autocomplete="off" aria-label="紅方選手編號 Red competitor number"></label>
-          <span class="tag" id="red-tag" hidden>零分 Zero</span>
-          <span class="tag win" id="red-win" hidden>勝 Win</span>
+          <span class="chip">Red</span>
+          <label class="num"><span>No.</span> <input id="red-no" type="text" inputmode="numeric" maxlength="8" placeholder="#" autocomplete="off" aria-label="Red competitor number"></label>
+          <span class="tag" id="red-tag" hidden>⌀ Zero</span>
+          <span class="tag win" id="red-win" hidden>★ Win</span>
         </div>
         <div class="sum">
-          <div class="cell" id="red-c1"><small>第1套<span class="en">P1</span></small><b id="red-s1">—</b></div>
-          <div class="cell" id="red-c2"><small>第2套<span class="en">P2</span></small><b id="red-s2">—</b></div>
-          <div class="cell sumc"><small>合計<span class="en">Total</span></small><b id="red-sum">0.0</b></div>
+          <div class="cell" id="red-c1"><small>P1</small><b id="red-s1">—</b></div>
+          <div class="cell" id="red-c2"><small>P2</small><b id="red-s2">—</b></div>
+          <div class="cell sumc"><small>Total</small><b id="red-sum">0.0</b></div>
         </div>
       </div>
       <div class="tot-wrap">
-        <div class="tot-label" id="red-tl">第1套 Pattern 1</div>
+        <div class="tot-label" id="red-tl">Pattern 1</div>
         <div class="total" id="red-total" aria-live="polite">10.0</div>
       </div>
     </div>
     <div class="phases">
       <div class="phase">
         <div class="ph-head">
-          <div class="ph-label">① 準確度<span class="en">Accuracy</span><small id="red-dn">−0.2 × 0</small></div>
+          <div class="ph-label">① Accuracy<small id="red-dn">−0.2 × 0</small></div>
           <div class="ph-read"><span id="red-p1">6.0</span><small>/6.0</small></div>
         </div>
         <div class="meter"><b id="red-m1"></b></div>
-        <button class="big deduct" type="button" data-act="ded" id="red-ded" aria-label="紅方 扣 0.2 分 Red deduct 0.2">−0.2</button>
+        <button class="big deduct" type="button" data-act="ded" id="red-ded" aria-label="Red deduct 0.2">−0.2</button>
       </div>
       <div class="phase">
         <div class="ph-head">
-          <div class="ph-label">② 表現<span class="en">Performance</span><small id="red-an">+0.5 × 0</small></div>
+          <div class="ph-label">② Performance<small id="red-an">+0.5 × 0</small></div>
           <div class="ph-read"><span id="red-p2">0.0</span><small>/4.0</small></div>
         </div>
         <div class="meter"><b id="red-m2"></b></div>
-        <button class="big add" type="button" data-act="add" id="red-add" aria-label="紅方 加 0.5 分 Red add 0.5">+0.5</button>
+        <button class="big add" type="button" data-act="add" id="red-add" aria-label="Red add 0.5">+0.5</button>
       </div>
     </div>
     <div class="foot">
-      <button class="small st" type="button" data-act="undo" id="red-undo"><span>復原上一步</span><span class="en">Undo</span></button>
+      <button class="small st" type="button" data-act="undo" id="red-undo"><span>↶ Undo</span></button>
       <button class="small zero st" type="button" data-act="zero" id="red-zero"></button>
     </div>
   </section>
@@ -419,52 +421,52 @@
     <div class="stage" aria-hidden="true"><span id="st1"></span><span id="st2"></span><span id="st3"></span></div>
   </div>
 
-  <section class="panel blue" data-side="blue" aria-label="藍方 Blue">
+  <section class="panel blue" data-side="blue" aria-label="Blue">
     <div class="head">
       <div class="who">
         <div class="chip-row">
-          <span class="chip">藍方<span class="en">Blue</span></span>
-          <label class="num"><span>編號<span class="en">No.</span></span> <input id="blue-no" type="text" inputmode="numeric" maxlength="8" placeholder="#" autocomplete="off" aria-label="藍方選手編號 Blue competitor number"></label>
-          <span class="tag" id="blue-tag" hidden>零分 Zero</span>
-          <span class="tag win" id="blue-win" hidden>勝 Win</span>
+          <span class="chip">Blue</span>
+          <label class="num"><span>No.</span> <input id="blue-no" type="text" inputmode="numeric" maxlength="8" placeholder="#" autocomplete="off" aria-label="Blue competitor number"></label>
+          <span class="tag" id="blue-tag" hidden>⌀ Zero</span>
+          <span class="tag win" id="blue-win" hidden>★ Win</span>
         </div>
         <div class="sum">
-          <div class="cell" id="blue-c1"><small>第1套<span class="en">P1</span></small><b id="blue-s1">—</b></div>
-          <div class="cell" id="blue-c2"><small>第2套<span class="en">P2</span></small><b id="blue-s2">—</b></div>
-          <div class="cell sumc"><small>合計<span class="en">Total</span></small><b id="blue-sum">0.0</b></div>
+          <div class="cell" id="blue-c1"><small>P1</small><b id="blue-s1">—</b></div>
+          <div class="cell" id="blue-c2"><small>P2</small><b id="blue-s2">—</b></div>
+          <div class="cell sumc"><small>Total</small><b id="blue-sum">0.0</b></div>
         </div>
       </div>
       <div class="tot-wrap">
-        <div class="tot-label" id="blue-tl">第1套 Pattern 1</div>
+        <div class="tot-label" id="blue-tl">Pattern 1</div>
         <div class="total" id="blue-total" aria-live="polite">10.0</div>
       </div>
     </div>
     <div class="phases">
       <div class="phase">
         <div class="ph-head">
-          <div class="ph-label">① 準確度<span class="en">Accuracy</span><small id="blue-dn">−0.2 × 0</small></div>
+          <div class="ph-label">① Accuracy<small id="blue-dn">−0.2 × 0</small></div>
           <div class="ph-read"><span id="blue-p1">6.0</span><small>/6.0</small></div>
         </div>
         <div class="meter"><b id="blue-m1"></b></div>
-        <button class="big deduct" type="button" data-act="ded" id="blue-ded" aria-label="藍方 扣 0.2 分 Blue deduct 0.2">−0.2</button>
+        <button class="big deduct" type="button" data-act="ded" id="blue-ded" aria-label="Blue deduct 0.2">−0.2</button>
       </div>
       <div class="phase">
         <div class="ph-head">
-          <div class="ph-label">② 表現<span class="en">Performance</span><small id="blue-an">+0.5 × 0</small></div>
+          <div class="ph-label">② Performance<small id="blue-an">+0.5 × 0</small></div>
           <div class="ph-read"><span id="blue-p2">0.0</span><small>/4.0</small></div>
         </div>
         <div class="meter"><b id="blue-m2"></b></div>
-        <button class="big add" type="button" data-act="add" id="blue-add" aria-label="藍方 加 0.5 分 Blue add 0.5">+0.5</button>
+        <button class="big add" type="button" data-act="add" id="blue-add" aria-label="Blue add 0.5">+0.5</button>
       </div>
     </div>
     <div class="foot">
-      <button class="small st" type="button" data-act="undo" id="blue-undo"><span>復原上一步</span><span class="en">Undo</span></button>
+      <button class="small st" type="button" data-act="undo" id="blue-undo"><span>↶ Undo</span></button>
       <button class="small zero st" type="button" data-act="zero" id="blue-zero"></button>
     </div>
   </section>
 </main>
 
-<section id="results" hidden aria-label="五位裁判結果 Five-judge results">
+<section id="results" hidden aria-label="Five-judge results">
   <div class="toolbar"><button class="btn" id="clear" type="button" hidden></button><span class="msg" id="clear-msg" aria-live="polite"></span></div>
   <div class="bouts" id="courts"></div>
   <div class="cards" id="cards"></div>
@@ -472,7 +474,7 @@
   <div class="banner" id="banner"></div>
   <div class="tbl-wrap" id="tbl-wrap"></div>
   <div>
-    <h2 class="sec-title">評分紀錄<span class="en">Score log</span> · 每次完成一套留一筆,最新在上<span class="en">one entry per finished pattern, newest first</span></h2>
+    <h2 class="sec-title">Score log · one entry per finished pattern, newest first</h2>
     <div class="log-wrap" id="log-wrap"></div>
   </div>
 </section>
@@ -505,9 +507,8 @@
   var num = function (v) { return (typeof v === 'number' && isFinite(v)) ? v : null; };
   function el(tag, cls, txt) { var n = document.createElement(tag); if (cls) n.className = cls; if (txt != null) n.textContent = txt; return n; }
   // Chinese text + smaller English beside it.
-  function bi(node, zh, en) { node.appendChild(document.createTextNode(zh)); node.appendChild(el('span', 'en', en)); return node; }
-  function setSt(node, zh, en) { node.textContent = ''; node.appendChild(el('span', null, zh)); node.appendChild(el('span', 'en', en)); }
-  function setInline(node, zh, en) { node.textContent = ''; bi(node, zh, en); }
+  function bi(node, zh, en) { node.appendChild(document.createTextNode(en)); return node; }
+  function setSt(node, zh, en) { node.textContent = en; }
 
   /* ---------- local state ---------- */
   function sanEntry(x) {
@@ -550,7 +551,7 @@
     var cur = score(e), p1 = 60 - 2 * e.d, p2 = 5 * e.a;
     var big = $(side + '-total');
     big.textContent = fmt(locked ? t.sum : cur);
-    $(side + '-tl').textContent = locked ? '兩套合計 Total of 2' : '第' + (idx + 1) + '套 Pattern ' + (idx + 1);
+    $(side + '-tl').textContent = locked ? 'Total of 2' : 'Pattern ' + (idx + 1);
     if (bump) { big.classList.remove('bump'); void big.offsetWidth; big.classList.add('bump'); }
     $(side + '-s1').textContent = fmt(t.s1);
     $(side + '-s2').textContent = t.s2 === null ? '—' : fmt(t.s2);
@@ -567,7 +568,7 @@
     $(side + '-add').disabled = locked || e.z || e.a >= MAX_A;
     $(side + '-undo').disabled = locked || e.z || e.h.length === 0;
     var z = $(side + '-zero');
-    if (e.z) setSt(z, '取消零分', 'Cancel zero'); else setSt(z, '零分 0', 'Zero');
+    if (e.z) setSt(z, '', '✕ Cancel zero'); else setSt(z, '', '⌀ Zero');
     z.classList.toggle('on', e.z);
     z.disabled = locked;
     $(side + '-tag').hidden = locked || !e.z;
@@ -583,18 +584,18 @@
     $('st3').className = 'st ' + (st === 3 ? 'on' : '');
     var next = $('next'), back = $('back'), res = $('result');
     next.hidden = st === 3;
-    if (st === 1) setSt(next, '完成第1套 →', 'Finish Pattern 1');
-    else setSt(next, '完成第2套 · 結算', 'Finish Pattern 2 · Total');
+    if (st === 1) setSt(next, '', '✓ Finish pattern 1');
+    else setSt(next, '', '✓ Finish pattern 2');
     back.hidden = st === 1;
-    if (st === 2) setSt(back, '← 回第1套', 'Back to Pattern 1'); else setSt(back, '← 返回修改', 'Back to edit');
+    if (st === 2) setSt(back, '', '← Pattern 1'); else setSt(back, '', '← Edit');
     var rt = totals('red').sum, bt = totals('blue').sum;
     var winner = st === 3 ? (rt > bt ? 'red' : (bt > rt ? 'blue' : 'tie')) : null;
     res.hidden = st !== 3;
     if (st === 3) {
       res.className = 'result ' + winner;
       res.textContent = '';
-      res.appendChild(el('div', null, '我的判定 My call'));
-      res.appendChild(el('div', null, winner === 'tie' ? '平手 Draw' : (winner === 'red' ? '紅方勝 Red wins' : '藍方勝 Blue wins')));
+      res.appendChild(el('div', null, 'My call'));
+      res.appendChild(el('div', null, winner === 'tie' ? 'Draw' : (winner === 'red' ? 'Red wins' : 'Blue wins')));
       res.appendChild(el('div', 'rs', fmt(rt) + ' : ' + fmt(bt)));
     }
     ['red', 'blue'].forEach(function (side) {
@@ -604,9 +605,9 @@
     });
     var jb = $('judge-seg').querySelectorAll('button');
     for (var i = 0; i < jb.length; i++) jb[i].setAttribute('aria-pressed', String(+jb[i].getAttribute('data-slot') === J.slot));
-    if (!resetBtn.classList.contains('confirm')) setSt(resetBtn, '重置整回合', 'Reset round');
+    if (!resetBtn.classList.contains('confirm')) setSt(resetBtn, '', '↺ Round');
     resetpBtn.hidden = st === 3;
-    if (!resetpBtn.classList.contains('confirm')) setSt(resetpBtn, '重置本套', 'Reset pattern');
+    if (!resetpBtn.classList.contains('confirm')) setSt(resetpBtn, '', '↺ Pattern');
   }
 
   function renderInputs() {
@@ -620,21 +621,21 @@
   function pending() { return S.stage >= 2 && (!S.sent[1] || (S.stage >= 3 && !S.sent[2])); }
   function missing() {
     var m = [];
-    if (!J.slot) m.push('裁判 Judge');
-    if (!idPart(S.redNo)) m.push('紅方編號 Red No.');
-    if (!idPart(S.blueNo)) m.push('藍方編號 Blue No.');
+    if (!J.slot) m.push('Judge');
+    if (!idPart(S.redNo)) m.push('Red No.');
+    if (!idPart(S.blueNo)) m.push('Blue No.');
     return m;
   }
   function renderStatus() {
     var k = 'idle', msg;
     var p = pending(), miss = missing();
-    if (!db) { k = 'off'; msg = '離線 Offline · 分數只存在這台裝置 saved on this device only'; }
-    else if (!canWrite) { k = 'err'; msg = '沒有寫入權限 No write access · 請用協作者身分開啟 open as a collaborator'; }
-    else if (net === 'sending') { k = 'busy'; msg = '傳送中 Sending…'; }
-    else if (net === 'error') { k = 'err'; msg = '傳送失敗 Failed' + (errCode ? '(' + errCode + ')' : '') + ' · 請重試 retry'; }
-    else if (p) { k = 'warn'; msg = '尚未回傳 Not sent' + (miss.length ? ' · 請填 fill: ' + miss.join('、') : ''); }
-    else if (S.stage >= 2) { k = 'ok'; msg = '已回傳至結果頁 Sent to results'; }
-    else { msg = miss.length ? '請先填 Fill first: ' + miss.join('、') : '完成第1套後自動回傳 Auto-sends after Pattern 1'; }
+    if (!db) { k = 'off'; msg = 'Offline · scores saved on this device only'; }
+    else if (!canWrite) { k = 'err'; msg = 'No write access · open as a collaborator'; }
+    else if (net === 'sending') { k = 'busy'; msg = 'Sending…'; }
+    else if (net === 'error') { k = 'err'; msg = 'Send failed' + (errCode ? ' (' + errCode + ')' : '') + ' · retry'; }
+    else if (p) { k = 'warn'; msg = 'Not sent' + (miss.length ? ' · fill: ' + miss.join(', ') : ''); }
+    else if (S.stage >= 2) { k = 'ok'; msg = 'Sent to results ✓'; }
+    else { msg = miss.length ? 'Fill first: ' + miss.join(', ') : 'Auto-sends after Pattern 1'; }
     $('sync').setAttribute('data-k', k);
     $('sync-text').textContent = msg;
     $('sync').title = msg;
@@ -703,8 +704,8 @@
   var resetBtn = $('reset'), resetTimer = null;
   resetBtn.addEventListener('click', function () {
     if (!resetBtn.classList.contains('confirm')) {
-      resetBtn.classList.add('confirm'); setSt(resetBtn, '再按一次確認重置', 'Tap again to reset');
-      resetTimer = setTimeout(function () { resetBtn.classList.remove('confirm'); setSt(resetBtn, '重置整回合', 'Reset round'); }, 3000);
+      resetBtn.classList.add('confirm'); setSt(resetBtn, '', 'Tap again ↺');
+      resetTimer = setTimeout(function () { resetBtn.classList.remove('confirm'); setSt(resetBtn, '', '↺ Round'); }, 3000);
       return;
     }
     clearTimeout(resetTimer);
@@ -717,8 +718,8 @@
   resetpBtn.addEventListener('click', function () {
     if (S.stage === 3) return;
     if (!resetpBtn.classList.contains('confirm')) {
-      resetpBtn.classList.add('confirm'); setSt(resetpBtn, '再按一次確認', 'Tap again to confirm');
-      resetpTimer = setTimeout(function () { resetpBtn.classList.remove('confirm'); setSt(resetpBtn, '重置本套', 'Reset pattern'); }, 3000);
+      resetpBtn.classList.add('confirm'); setSt(resetpBtn, '', 'Tap again ↺');
+      resetpTimer = setTimeout(function () { resetpBtn.classList.remove('confirm'); setSt(resetpBtn, '', '↺ Pattern'); }, 3000);
       return;
     }
     clearTimeout(resetpTimer);
@@ -762,8 +763,8 @@
     if (!a.length) return null;
     return a.reduce(function (x, y) { return x + y; }, 0) / a.length;
   }
-  var courtZh = function (c) { return c ? '場地 ' + c : '未指定場地'; };
-  var courtEn = function (c) { return c ? 'Court ' + c : 'No court'; };
+  var courtZh = function (c) { return c ? 'Court ' + c : 'No court'; };
+  var courtEn = courtZh;
 
   // Each finished judge casts one vote for the side with the higher two-pattern total (equal = draw).
   function summarize(sel) {
@@ -790,41 +791,39 @@
 
   // Majority of judges decides: 3 of 5 votes wins at once; otherwise the side ahead "leads" until all five finish.
   function verdict(m) {
-    if (!m.complete) return { cls: '', zh: '進行中', en: 'In progress', zs: '已回報 ' + m.reported + '/5 位裁判,等待第2套完成', es: m.reported + '/5 judges reported, waiting for Pattern 2' };
-    var side, zh, en;
-    if (m.vR >= 3 || m.vB >= 3) {
-      side = m.vR >= 3 ? 'red' : 'blue';
-      zh = side === 'red' ? '紅方勝' : '藍方勝'; en = side === 'red' ? 'Red wins' : 'Blue wins';
-    } else if (m.complete === 5) {
-      if (m.vR === m.vB) { side = 'tie'; zh = '平手'; en = 'Draw'; }
-      else { side = m.vR > m.vB ? 'red' : 'blue'; zh = side === 'red' ? '紅方勝' : '藍方勝'; en = side === 'red' ? 'Red wins' : 'Blue wins'; }
-    } else if (m.vR === m.vB) { side = 'tie'; zh = '暫時平手'; en = 'Level so far'; }
-    else { side = m.vR > m.vB ? 'red' : 'blue'; zh = side === 'red' ? '紅方領先' : '藍方領先'; en = side === 'red' ? 'Red leads' : 'Blue leads'; }
+    if (!m.complete) return { cls: '', en: 'In progress', es: m.reported + '/5 judges reported, waiting for Pattern 2' };
+    var side, en;
+    var winE = function (s) { return s === 'red' ? 'Red wins' : 'Blue wins'; };
+    if (m.vR >= 3 || m.vB >= 3) { side = m.vR >= 3 ? 'red' : 'blue'; en = winE(side); }
+    else if (m.complete === 5) {
+      if (m.vR === m.vB) { side = 'tie'; en = 'Draw'; }
+      else { side = m.vR > m.vB ? 'red' : 'blue'; en = winE(side); }
+    } else if (m.vR === m.vB) { side = 'tie'; en = 'Level so far'; }
+    else { side = m.vR > m.vB ? 'red' : 'blue'; en = side === 'red' ? 'Red leads' : 'Blue leads'; }
     var avg = (m.sumR / 10 / m.complete).toFixed(2) + ' : ' + (m.sumB / 10 / m.complete).toFixed(2);
-    var zs = '票數 ' + m.vR + ' : ' + m.vB + (m.vD ? '(平 ' + m.vD + ')' : '') + ' · 已完成 ' + m.complete + '/5 位裁判 · 平均分 ' + avg;
     var es = 'Votes ' + m.vR + ' : ' + m.vB + (m.vD ? ' (' + m.vD + ' draw)' : '') + ' · ' + m.complete + '/5 judges done · Avg ' + avg;
-    if (side === 'tie' && m.complete === 5) { zs += ' · 需主審裁定'; es += ' · Referee decides'; }
-    return { cls: side, zh: zh, en: en, zs: zs, es: es };
+    if (side === 'tie' && m.complete === 5) es += ' · Referee decides';
+    return { cls: side, en: en, es: es };
   }
 
   function renderClear() {
     var b = $('clear');
     b.hidden = !(db && isAdmin);
     if (clearing || b.classList.contains('confirm')) return;
-    if (curCourt === 'all') setSt(b, '清除全部結果', 'Clear all results');
-    else setSt(b, '清除' + courtZh(curCourt) + '結果', 'Clear ' + courtEn(curCourt) + ' results');
+    if (curCourt === 'all') setSt(b, '', '✕ Clear all results');
+    else setSt(b, '' + courtZh(curCourt) + '', '✕ Clear ' + courtEn(curCourt) + ' results');
   }
   var clearTimer = null;
   $('clear').addEventListener('click', async function () {
     var b = $('clear');
     if (clearing || !db) return;
     if (!b.classList.contains('confirm')) {
-      b.classList.add('confirm'); setSt(b, '再按一次確認清除', 'Tap again to clear');
+      b.classList.add('confirm'); setSt(b, '', 'Tap again ✕');
       clearTimer = setTimeout(function () { b.classList.remove('confirm'); renderClear(); }, 4000);
       return;
     }
     clearTimeout(clearTimer); b.classList.remove('confirm');
-    clearing = true; setSt(b, '清除中…', 'Clearing…');
+    clearing = true; setSt(b, '', 'Clearing…');
     var msg = $('clear-msg'), court = curCourt, n = 0;
     msg.textContent = '';
     try {
@@ -841,9 +840,9 @@
           for (var i = 0; i < docs.length; i++) { await db.doc(names[k] + '/' + docs[i].id).delete(); n++; }
         }
       }
-      msg.textContent = '已清除 ' + n + ' 筆 · Cleared ' + n + ' entr' + (n === 1 ? 'y' : 'ies');
+      msg.textContent = 'Cleared ' + n + ' entr' + (n === 1 ? 'y' : 'ies');
     } catch (e) {
-      msg.textContent = '清除失敗 Clear failed' + (e && e.code ? '(' + e.code + ')' : '');
+      msg.textContent = 'Clear failed' + (e && e.code ? '(' + e.code + ')' : '');
     } finally {
       clearing = false; renderClear();
     }
@@ -859,12 +858,12 @@
     var all = groupBouts();
 
     if (!db) {
-      banner.appendChild(bi(el('div', 'b2'), '這個頁面還沒連到共用資料庫。請在 claude.ai 登入後開啟。', 'Not connected to the shared database. Open this page signed in on claude.ai.'));
+      banner.appendChild(bi(el('div', 'b2'), '', 'Not connected to the shared database. Open this page signed in on claude.ai.'));
       curCourt = 'all'; renderLog(); return;
     }
     if (!all.length) {
-      banner.appendChild(bi(el('div', 'b1'), '等待裁判回傳', 'Waiting for judges'));
-      banner.appendChild(bi(el('div', 'b2'), '裁判在「計分」畫面完成第1套後,結果會自動出現在這裡。', 'Results appear here after judges finish Pattern 1 on the Scoring screen.'));
+      banner.appendChild(bi(el('div', 'b1'), '', 'Waiting for judges'));
+      banner.appendChild(bi(el('div', 'b2'), '', 'Results appear here after judges finish Pattern 1 on the Scoring screen.'));
       curCourt = 'all'; renderLog(); return;
     }
 
@@ -878,15 +877,15 @@
 
     if (courts.length > 1) {
       courtsEl.hidden = false;
-      courtsEl.appendChild(bi(el('span', 'lbl'), '場地', 'Court'));
+      courtsEl.appendChild(bi(el('span', 'lbl'), '', 'Court'));
       var mk = function (zh, en, val) {
         var btn = bi(el('button', 'bout'), zh, en); btn.type = 'button';
         btn.setAttribute('aria-pressed', String(cur === val));
         btn.addEventListener('click', function () { selCourt = val; selKey = null; renderResults(); });
         courtsEl.appendChild(btn);
       };
-      mk('全部場地', 'All courts', 'all');
-      courts.forEach(function (ct) { mk(ct || '未指定', ct ? '' : 'No court', ct); });
+      mk('', 'All courts', 'all');
+      courts.forEach(function (ct) { mk('', ct || 'No court', ct); });
     }
 
     if (cur === 'all') {
@@ -896,9 +895,8 @@
         var v = verdict(summarize(b));
         var card = el('button', 'card ' + v.cls); card.type = 'button';
         card.appendChild(bi(el('div', 'c1'), courtZh(ct), courtEn(ct)));
-        card.appendChild(el('div', 'c2', '紅 Red #' + b.red + ' vs 藍 Blue #' + b.blue));
+        card.appendChild(el('div', 'c2', 'Red #' + b.red + ' vs Blue #' + b.blue));
         card.appendChild(bi(el('div', 'c3'), v.zh, v.en));
-        card.appendChild(el('div', 'c4', v.zs));
         card.appendChild(el('div', 'c4', v.es));
         card.addEventListener('click', function () { selCourt = ct; selKey = null; renderResults(); });
         cardsEl.appendChild(card);
@@ -910,9 +908,9 @@
     var sel = list[0];
     for (var i = 0; i < list.length; i++) if (list[i].key === selKey) sel = list[i];
     boutsEl.hidden = false; wrap.hidden = false;
-    boutsEl.appendChild(bi(el('span', 'lbl'), '對戰', 'Match'));
+    boutsEl.appendChild(bi(el('span', 'lbl'), '', 'Match'));
     list.slice(0, 12).forEach(function (b) {
-      var btn = el('button', 'bout', '紅 Red #' + b.red + ' vs 藍 Blue #' + b.blue);
+      var btn = el('button', 'bout', 'Red #' + b.red + ' vs Blue #' + b.blue);
       btn.type = 'button';
       btn.setAttribute('aria-pressed', String(b.key === sel.key));
       btn.addEventListener('click', function () { selKey = b.key; renderResults(); });
@@ -922,20 +920,19 @@
     var m = summarize(sel), v = verdict(m);
     banner.className = 'banner ' + v.cls;
     banner.appendChild(bi(el('div', 'b1'), v.zh, v.en));
-    banner.appendChild(el('div', 'b2', courtZh(sel.court) + ' ' + courtEn(sel.court) + ' · 紅 Red #' + sel.red + ' vs 藍 Blue #' + sel.blue));
-    banner.appendChild(el('div', 'b2', v.zs));
+    banner.appendChild(el('div', 'b2', courtZh(sel.court) + ' · Red #' + sel.red + ' vs Blue #' + sel.blue));
     banner.appendChild(el('div', 'b2', v.es));
 
     var t = el('table');
     var thead = el('thead');
     var h1 = el('tr');
-    h1.appendChild(Object.assign(bi(el('th', 'j'), '裁判', 'Judge'), { rowSpan: 2 }));
-    h1.appendChild(Object.assign(bi(el('th', 'r'), '紅方 #' + sel.red, 'Red'), { colSpan: 3 }));
-    h1.appendChild(Object.assign(bi(el('th', 'b'), '藍方 #' + sel.blue, 'Blue'), { colSpan: 3 }));
-    h1.appendChild(Object.assign(bi(el('th', 'v'), '投票', 'Vote'), { rowSpan: 2 }));
+    h1.appendChild(Object.assign(bi(el('th', 'j'), '', 'Judge'), { rowSpan: 2 }));
+    h1.appendChild(Object.assign(bi(el('th', 'r'), '', 'Red #' + sel.red), { colSpan: 3 }));
+    h1.appendChild(Object.assign(bi(el('th', 'b'), '', 'Blue #' + sel.blue), { colSpan: 3 }));
+    h1.appendChild(Object.assign(bi(el('th', 'v'), '', 'Vote'), { rowSpan: 2 }));
     thead.appendChild(h1);
     var h2 = el('tr');
-    [['r', '第1套', 'P1'], ['r', '第2套', 'P2'], ['r', '合計', 'Total'], ['b', '第1套', 'P1'], ['b', '第2套', 'P2'], ['b', '合計', 'Total']]
+    [['r', '', 'P1'], ['r', '', 'P2'], ['r', '', 'Total'], ['b', '', 'P1'], ['b', '', 'P2'], ['b', '', 'Total']]
       .forEach(function (x) { h2.appendChild(bi(el('th', x[0] + ' sub'), x[1], x[2])); });
     thead.appendChild(h2);
     t.appendChild(thead);
@@ -943,7 +940,7 @@
     var tb = el('tbody');
     m.rows.forEach(function (r) {
       var tr = el('tr');
-      var jc = el('td', 'j', '裁判 Judge ' + r.slot);
+      var jc = el('td', 'j', 'Judge ' + r.slot);
       if (r.e && r.e.judge) jc.appendChild(el('small', null, String(r.e.judge)));
       tr.appendChild(jc);
       var vals = r.e ? [r.r1, r.r2, r.done ? r.rs : null, r.b1, r.b2, r.done ? r.bs : null] : [null, null, null, null, null, null];
@@ -951,9 +948,9 @@
         tr.appendChild(el('td', (i === 2 || i === 5 ? 'tot ' : '') + (i === 3 ? 'mid ' : '') + (x === null ? 'na' : ''), f1(x)));
       });
       var vt = el('td', 'vt');
-      if (r.vote === 'r') vt.appendChild(bi(el('span', 'vote r'), '紅', 'Red'));
-      else if (r.vote === 'b') vt.appendChild(bi(el('span', 'vote b'), '藍', 'Blue'));
-      else if (r.vote === 'd') vt.appendChild(bi(el('span', 'vote d'), '平', 'Draw'));
+      if (r.vote === 'r') vt.appendChild(bi(el('span', 'vote r'), '', 'Red'));
+      else if (r.vote === 'b') vt.appendChild(bi(el('span', 'vote b'), '', 'Blue'));
+      else if (r.vote === 'd') vt.appendChild(bi(el('span', 'vote d'), '', 'Draw'));
       else { vt.textContent = r.e ? '…' : '—'; vt.className = 'vt na'; }
       tr.appendChild(vt);
       tb.appendChild(tr);
@@ -961,7 +958,7 @@
     t.appendChild(tb);
 
     var tf = el('tfoot'), fr = el('tr');
-    fr.appendChild(bi(el('td', 'j'), '平均', 'Average'));
+    fr.appendChild(bi(el('td', 'j'), '', 'Average'));
     [m.c.r1, m.c.r2, m.c.rs, m.c.b1, m.c.b2, m.c.bs].forEach(function (arr, i) {
       var a = avgCol(arr);
       fr.appendChild(el('td', (i === 2 || i === 5 ? 'tot ' : '') + (i === 3 ? 'mid' : ''), a === null ? '—' : (a / 10).toFixed(2)));
@@ -976,16 +973,16 @@
     var w = $('log-wrap');
     w.textContent = '';
     var list = curCourt === 'all' ? LOG : LOG.filter(function (r) { return String(r.court == null ? '' : r.court) === curCourt; });
-    if (!list.length) { w.appendChild(bi(el('div', 'empty'), db ? '還沒有紀錄。' : '連線後這裡會列出每一次回傳的分數。', db ? 'No entries yet.' : 'Every submitted score is listed here once connected.')); return; }
+    if (!list.length) { w.appendChild(bi(el('div', 'empty'), db ? '' : '', db ? 'No entries yet.' : 'Every submitted score is listed here once connected.')); return; }
     var t = el('table'), th = el('thead'), tr = el('tr');
-    [['時間', 'Time'], ['場地', 'Court'], ['裁判', 'Judge'], ['紅方 #', 'Red'], ['藍方 #', 'Blue'], ['套', 'Pattern'], ['紅分', 'Red pts'], ['藍分', 'Blue pts']]
+    [['', 'Time'], ['', 'Court'], ['', 'Judge'], ['', 'Red'], ['', 'Blue'], ['', 'Pattern'], ['', 'Red pts'], ['', 'Blue pts']]
       .forEach(function (x) { tr.appendChild(bi(el('th'), x[0], x[1])); });
     th.appendChild(tr); t.appendChild(th);
     var tb = el('tbody');
     list.forEach(function (r) {
       var d = new Date(num(r.ts) || 0), row = el('tr');
       var time = (d.getMonth() + 1) + '/' + d.getDate() + ' ' + ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2) + ':' + ('0' + d.getSeconds()).slice(-2);
-      [time, r.court || '—', (r.slot | 0) + (r.judge ? ' ' + r.judge : ''), r.red, r.blue, '第' + (r.stage | 0) + '套 P' + (r.stage | 0), f1(num(r.redScore)), f1(num(r.blueScore))]
+      [time, r.court || '—', (r.slot | 0) + (r.judge ? ' ' + r.judge : ''), r.red, r.blue, 'P' + (r.stage | 0), f1(num(r.redScore)), f1(num(r.blueScore))]
         .forEach(function (x) { row.appendChild(el('td', null, String(x == null ? '' : x))); });
       tb.appendChild(row);
     });
