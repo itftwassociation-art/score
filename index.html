@@ -1,202 +1,88 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>ITF TUL Scoreboard</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Noto+Sans+TC:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&display=swap">
 <style>
-  /* Layout: top row = judge + name first, then view tabs and sync; board = red | centre control strip | blue (strip becomes a row between the panels in portrait). One screen, no scrolling. */
+  /* One screen, no scrolling. Landscape: red | centre strip | blue (mirrored). Portrait: red / strip / blue. */
   :root {
-    --bg: #E8EBF0;
-    --fg: #141A24;
-    --muted: #586172;
-    --line: #C6CCD7;
-    --surface: #F6F8FB;
-    --red: #C42E33;
-    --blue: #1D4DBB;
-    --ink: #FFFFFF;
-    --ok: #1B7F4B;
-    --warn: #9A5B00;
-    --err: #B3261E;
+    --bg: #E8EBF0; --fg: #141A24; --line: #C6CCD7;
+    --red: #C42E33; --blue: #1D4DBB;
     --font-display: 'Barlow Condensed', 'Arial Narrow', 'Helvetica Neue', sans-serif;
-    --font-body: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif;
+    --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   }
   @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #0D1117;
-      --fg: #E7EBF2;
-      --muted: #98A2B3;
-      --line: #262D3A;
-      --surface: #151B25;
-      --red: #B02429;
-      --blue: #1A429E;
-      --ok: #52C98B;
-      --warn: #E0A84A;
-      --err: #FF8A80;
-      color-scheme: dark;
-    }
+    :root:not([data-theme="light"]) { --bg: #0D1117; --fg: #E7EBF2; --line: #262D3A; --red: #B02429; --blue: #1A429E; color-scheme: dark; }
   }
-  :root[data-theme="dark"] {
-    --bg: #0D1117;
-    --fg: #E7EBF2;
-    --muted: #98A2B3;
-    --line: #262D3A;
-    --surface: #151B25;
-    --red: #B02429;
-    --blue: #1A429E;
-    --ok: #52C98B;
-    --warn: #E0A84A;
-    --err: #FF8A80;
-    color-scheme: dark;
-  }
+  :root[data-theme="dark"] { --bg: #0D1117; --fg: #E7EBF2; --line: #262D3A; --red: #B02429; --blue: #1A429E; color-scheme: dark; }
 
   [hidden] { display: none !important; }
   * { box-sizing: border-box; }
   html, body { height: 100%; }
   body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--fg);
-    font-family: var(--font-body);
-    padding-block: 8px;
-    padding-left: max(16px, env(safe-area-inset-left, 0px));
-    padding-right: max(16px, env(safe-area-inset-right, 0px));
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
+    margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body);
+    padding-block: 8px; padding-left: max(12px, env(safe-area-inset-left, 0px)); padding-right: max(12px, env(safe-area-inset-right, 0px));
+    display: flex; flex-direction: column; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
   }
   button { font: inherit; color: inherit; cursor: pointer; border: 0; user-select: none; -webkit-user-select: none; }
-  button:focus-visible, input:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
-  .btn:focus-visible, .field input:focus-visible, .seg button:focus-visible, .tabs button:focus-visible, .bout:focus-visible { outline-color: var(--fg); }
+  button:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+  .btn:focus-visible { outline-color: var(--fg); }
+  @media (max-height: 400px) { body { padding-block: 5px; } }
 
-  /* bilingual text: Chinese first, English smaller beside it (or under it in .st) */
-  .en { font-size: .78em; font-weight: 500; opacity: .85; margin-left: .35em; }
-  .st { display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.15; text-align: center; }
-  .st .en { display: block; margin: 0; }
-
-  /* ---------- top row: judge first ---------- */
-  .bar-top { display: flex; align-items: center; gap: 6px 10px; flex-wrap: wrap; }
-  .bar-top h1 {
-    margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 20px;
-    letter-spacing: .05em; text-transform: uppercase; line-height: 1; white-space: nowrap;
-  }
-  @media (max-height: 560px), (max-width: 760px) { .bar-top h1 { display: none; } }
-  .field { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--muted); white-space: nowrap; }
-  .field input {
-    min-height: 38px; width: 8em; max-width: 100%; padding: 0 10px; border-radius: 8px;
-    border: 2px solid var(--line); background: var(--surface); color: var(--fg); font: 700 14px var(--font-body);
-  }
-  .seg { display: flex; gap: 3px; }
-  .seg button {
-    min-width: 38px; padding: 0 6px; min-height: 38px; border-radius: 8px; background: transparent;
-    border: 2px solid var(--line); color: var(--fg); font: 700 16px var(--font-display);
-  }
-  .seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
-  .grow { flex: 1 1 4px; }
-  .tabs { display: flex; border: 2px solid var(--line); border-radius: 8px; overflow: hidden; }
-  .tabs button { background: transparent; padding: 0 12px; min-height: 36px; font-size: 13px; font-weight: 700; color: var(--muted); white-space: nowrap; }
-  .tabs button[aria-selected="true"] { background: var(--fg); color: var(--bg); }
-  .sync { flex: 0 1 auto; min-width: 0; max-width: 100%; display: flex; align-items: center; justify-content: flex-end; gap: 6px; font-size: 12px; font-weight: 700; }
-  #sync-text { min-width: 0; max-width: 22em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  @media (max-width: 700px) { #sync-text { max-width: 9em; } }
-  .sync .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); flex: none; }
-  .sync[data-k="ok"] .dot { background: var(--ok); }
-  .sync[data-k="warn"] .dot, .sync[data-k="busy"] .dot { background: var(--warn); }
-  .sync[data-k="err"] .dot { background: var(--err); }
-  .sync[data-k="ok"] { color: var(--ok); }
-  .sync[data-k="warn"], .sync[data-k="busy"] { color: var(--warn); }
-  .sync[data-k="err"] { color: var(--err); }
-  .sync[data-k="idle"], .sync[data-k="off"] { color: var(--muted); }
-
-  .btn {
-    min-height: 40px; padding: 0 8px; border-radius: 8px; background: transparent;
-    border: 2px solid var(--line); color: var(--fg); font-weight: 700; font-size: 13px;
-  }
-  .btn:disabled { opacity: .35; cursor: not-allowed; }
-  .btn.mini { min-height: 28px; padding: 0 8px; font-size: 12px; flex: none; white-space: nowrap; }
-  #reset.confirm, #resetp.confirm, #clear.confirm { background: var(--fg); color: var(--bg); border-color: var(--fg); }
-
-  @media (max-width: 900px) {
-    .tabs .en { display: none; }
-    #sync-text { max-width: 11em; }
-    .field input { width: 7em; }
-  }
-  @media (max-width: 760px) { #sync-text { display: none; } }
-  @media (max-width: 640px) {
-    .field input { width: 5.5em; }
-    .seg button { min-width: 34px; min-height: 36px; }
-    .tabs button { padding: 0 9px; }
-  }
-  @media (max-height: 400px) {
-    body { gap: 6px; padding-block: 5px; }
-  }
-
-  /* ---------- board: red | centre control strip | blue ---------- */
   main {
     flex: 1; min-height: 0; overflow: hidden; display: grid; gap: 8px;
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr) auto minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto minmax(0, 1fr);
   }
   @media (min-aspect-ratio: 5/4) {
-    main { grid-template-columns: minmax(0, 1fr) clamp(76px, 12vw, 104px) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+    main { grid-template-columns: minmax(0, 1fr) clamp(80px, 12vw, 110px) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
   }
-  .mid { display: flex; flex-direction: row; gap: 6px; min-width: 0; min-height: 0; }
-  .mid { overflow: hidden; }
-  .mid .btn { flex: 1; min-height: 40px; padding: 0 4px; line-height: 1.15; font-size: 12px; }
-  #next { flex: 1.4; min-height: 0; background: var(--fg); color: var(--bg); border-color: var(--fg); font-size: 14px; }
-  @media (max-width: 820px) { .mid .en { display: none; } }
-  .result { flex: 1.4; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 2px; padding: 4px; border-radius: 8px; color: #fff; font-weight: 700; font-size: 13px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+
+  /* ---------- centre strip ---------- */
+  .mid { display: flex; flex-direction: row; gap: 6px; min-width: 0; min-height: 0; overflow: hidden; }
+  .btn {
+    flex: 1; min-height: 44px; padding: 0 4px; border-radius: 8px; background: transparent;
+    border: 2px solid var(--line); color: var(--fg); font-weight: 700; font-size: 14px; line-height: 1.15;
+  }
+  #next { flex: 1.6; background: var(--fg); color: var(--bg); border-color: var(--fg); font-size: 16px; }
+  .btn.confirm { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+  .result {
+    flex: 1.6; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+    padding: 4px; border-radius: 8px; color: #fff; font-weight: 700; font-size: 15px; line-height: 1.2; font-variant-numeric: tabular-nums;
+  }
   .result .rs { font-family: var(--font-display); font-size: 20px; }
   .result.red { background: var(--red); }
   .result.blue { background: var(--blue); }
   .result.tie { background: var(--fg); color: var(--bg); }
-  .stage { display: none; }
   @media (min-aspect-ratio: 5/4) {
     .mid { flex-direction: column; }
-    .mid .btn { flex: 0 0 auto; }
+    .btn { flex: 0 0 auto; }
     #next, .result { flex: 1 1 0; min-height: 0; }
-    #back { order: 1; }
-    .result { order: 2; }
+    #back { order: 1; } .result { order: 2; }
   }
 
+  /* ---------- panels ---------- */
   .panel {
-    --side: var(--red); background: var(--side); color: var(--ink); border-radius: 12px; padding: 8px;
+    --side: var(--red); background: var(--side); color: #fff; border-radius: 12px; padding: 8px;
     display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: 6px;
-    container-type: size; min-width: 0; min-height: 0; overflow: hidden; position: relative;
+    container-type: size; min-width: 0; min-height: 0; overflow: hidden;
   }
   .panel.blue { --side: var(--blue); }
   .panel.win { box-shadow: inset 0 0 0 4px #fff; }
+  .panel.locked .phases, .panel.locked .foot { opacity: .5; }
+  .panel.zeroed .phases { opacity: .45; }
 
   .head { display: flex; justify-content: space-between; align-items: center; gap: 6px; min-width: 0; }
   .who { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-  .chip-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-  .chip {
-    display: inline-flex; align-items: baseline; gap: 4px; background: rgba(0,0,0,.28);
-    border-radius: 6px; padding: 2px 8px; font-weight: 700; font-size: 16px; white-space: nowrap;
-  }
-  .chip .en { font-family: var(--font-display); letter-spacing: .08em; font-size: 12px; }
-  .num { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; white-space: nowrap; }
-  .num input {
-    width: 4em; min-height: 30px; border-radius: 6px; border: 2px solid rgba(255,255,255,.75);
-    background: rgba(0,0,0,.22); color: #fff; font: 700 17px var(--font-display); text-align: center; padding: 0 4px;
-  }
-  .num input::placeholder { color: rgba(255,255,255,.6); }
-  .tag { background: #fff; color: #111; font-weight: 700; font-size: 12px; padding: 2px 6px; border-radius: 6px; white-space: nowrap; }
-  .tag.win { font-size: 13px; padding: 2px 8px; }
-
+  .chip-row { display: flex; align-items: center; gap: 6px; }
+  .chip { background: rgba(0,0,0,.28); border-radius: 6px; padding: 2px 10px; font: 700 16px var(--font-display); letter-spacing: .1em; text-transform: uppercase; }
+  .tag { background: #fff; color: #111; font-weight: 700; font-size: 12px; padding: 2px 8px; border-radius: 6px; white-space: nowrap; }
   .sum { display: flex; gap: 4px; }
-  .cell { background: rgba(0,0,0,.22); border-radius: 6px; padding: 1px 6px; min-width: 0; text-align: center; }
-  .cell small { display: block; font-size: 10px; font-weight: 500; opacity: .92; white-space: nowrap; }
-  .cell small .en { font-size: 1em; margin-left: .25em; }
+  .cell { background: rgba(0,0,0,.22); border-radius: 6px; padding: 1px 6px; text-align: center; }
+  .cell small { display: block; font-size: 10px; font-weight: 600; white-space: nowrap; }
   .cell b { display: block; font-family: var(--font-display); font-size: 17px; line-height: 1.1; font-variant-numeric: tabular-nums; }
   .cell.cur { outline: 2px solid rgba(255,255,255,.85); }
   .cell.sumc { background: #fff; color: var(--side); }
 
-  .tot-wrap { text-align: right; min-width: 0; }
-  .tot-label { font-size: 10px; font-weight: 700; letter-spacing: .02em; opacity: .95; white-space: nowrap; }
-  .tot-label .en { font-size: 1em; }
   .total {
     font-family: var(--font-display); font-weight: 700; font-size: 17vmin; font-size: min(24cqh, 26cqw);
     line-height: .86; font-variant-numeric: tabular-nums; text-align: right;
@@ -206,12 +92,9 @@
 
   .phases { display: grid; grid-template-columns: 1.3fr 1fr; gap: 8px; min-height: 0; }
   .phase { display: flex; flex-direction: column; gap: 4px; min-height: 0; min-width: 0; }
-  .ph-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 4px; min-width: 0; }
-  .ph-label { font-weight: 700; font-size: 12px; line-height: 1.1; min-width: 0; }
-  .ph-label .en { font-size: .85em; margin-left: .25em; }
-  .ph-label small { display: block; font-weight: 500; font-size: 11px; opacity: .88; }
-  .ph-read { font-family: var(--font-display); font-weight: 700; font-size: 22px; line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .ph-read small { font-size: 12px; opacity: .8; font-weight: 600; }
+  .ph-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 4px; }
+  .ph-label { font-weight: 700; font-size: 12px; line-height: 1.1; white-space: nowrap; }
+  .ph-read { font-family: var(--font-display); font-weight: 700; font-size: 22px; line-height: 1; font-variant-numeric: tabular-nums; }
   .meter { height: 4px; border-radius: 2px; background: rgba(0,0,0,.3); overflow: hidden; flex: none; }
   .meter b { display: block; height: 100%; background: #fff; width: 100%; transition: width .15s; }
 
@@ -221,297 +104,121 @@
   }
   .big:active:not(:disabled) { transform: scale(.97); }
   .big:disabled { opacity: .35; cursor: not-allowed; }
-  .big.deduct { background: #fff; color: var(--side); font-size: 16vmin; font-size: clamp(30px, 18cqh, 96px); }
-  .big.add { background: rgba(0,0,0,.32); color: #fff; border: 2px solid rgba(255,255,255,.7); font-size: 11vmin; font-size: clamp(24px, 11cqh, 60px); }
+  .big.deduct { background: #fff; color: var(--side); font-size: clamp(30px, min(18cqh, 19cqw), 96px); }
+  .big.add { background: rgba(0,0,0,.32); color: #fff; border: 2px solid rgba(255,255,255,.7); font-size: clamp(24px, min(11cqh, 15cqw), 60px); }
 
   .foot { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .small { min-height: 42px; border-radius: 10px; background: rgba(0,0,0,.3); color: #fff; font-weight: 700; font-size: 14px; padding: 0 4px; }
-  .small .en { font-size: .72em; }
+  .small { min-height: 44px; border-radius: 10px; background: rgba(0,0,0,.3); color: #fff; font-weight: 700; font-size: 15px; padding: 0 4px; }
   .small:disabled { opacity: .35; cursor: not-allowed; }
   .small.zero.on { background: #fff; color: var(--side); }
-  .panel.zeroed .phases { opacity: .45; }
-  .panel.locked .phases, .panel.locked .foot { opacity: .5; }
 
-  @container (max-width: 340px) {
-    .chip .en, .num > span .en { display: none; }
-    .chip-row { flex-wrap: nowrap; }
-    .cell small .en { display: none; }
-  }
   @container (max-width: 300px) {
-    .ph-label .en, .ph-label small { display: none; }
-    .ph-read { font-size: 17px; }
-    .ph-read small { font-size: 10px; }
+    .ph-label { font-size: 10px; } .ph-read { font-size: 16px; }
     .total { font-size: min(20cqh, 21cqw); }
-    .cell { padding: 1px 4px; }
-    .cell b { font-size: 15px; }
-    .sum { gap: 3px; }
+    .cell { padding: 1px 4px; } .cell b { font-size: 15px; }
   }
-  @container (max-height: 270px) {
-    .ph-label .en, .tot-label { display: none; }
-    .ph-label small { display: inline; margin-left: .35em; }
-    .big { min-height: 28px; }
-    .small { min-height: 34px; }
-    .small .en { display: none; }
-  }
-  @container (max-width: 340px) { .ph-label small { display: none; } .ph-label { font-size: 11px; } }
-  @container (max-width: 300px) { .ph-read small { display: none; } .ph-label { font-size: 9.5px; letter-spacing: -.01em; } .ph-read { font-size: 15px; } }
+  @container (max-height: 270px) { .big { min-height: 28px; } .small { min-height: 34px; } }
 
-/* ---------- results view ---------- */
-  #results { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-bottom: 12px; }
-  .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-  .toolbar:empty { display: none; }
-  .toolbar .msg { font-size: 13px; font-weight: 700; color: var(--muted); }
-  #clear.confirm, #resetp.confirm { background: var(--fg); color: var(--bg); border-color: var(--fg); }
-  .bouts { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-  .bouts .lbl { font-size: 13px; font-weight: 700; color: var(--muted); }
-  .bout {
-    background: transparent; border: 2px solid var(--line); border-radius: 8px; padding: 6px 12px;
-    font-weight: 700; font-size: 14px; color: var(--fg); min-height: 40px; font-variant-numeric: tabular-nums;
-  }
-  .bout[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
-  .banner { border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 6px; background: var(--surface); border: 2px solid var(--line); }
-  .banner.red { background: var(--red); border-color: var(--red); color: #fff; }
-  .banner.blue { background: var(--blue); border-color: var(--blue); color: #fff; }
-  .banner.tie { background: var(--fg); border-color: var(--fg); color: var(--bg); }
-  .banner .b1 { font-family: var(--font-body); font-weight: 700; font-size: clamp(30px, 7vw, 56px); line-height: 1.05; }
-  .banner .b1 .en { font-family: var(--font-display); font-size: .7em; letter-spacing: .02em; margin-left: .5em; }
-  .banner .b2 { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; opacity: .95; line-height: 1.5; }
-  .banner .b2 .en { font-size: 1em; margin-left: .3em; }
-  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
-  .card {
-    text-align: left; display: flex; flex-direction: column; gap: 4px; padding: 14px; border-radius: 14px;
-    background: var(--surface); border: 2px solid var(--line); color: var(--fg); min-width: 0;
-  }
-  .card.red { background: var(--red); border-color: var(--red); color: #fff; }
-  .card.blue { background: var(--blue); border-color: var(--blue); color: #fff; }
-  .card.tie { background: var(--fg); border-color: var(--fg); color: var(--bg); }
-  .card:focus-visible { outline-color: var(--fg); }
-  .card .c1 { font-size: 13px; font-weight: 700; letter-spacing: .04em; opacity: .92; }
-  .card .c2 { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
-  .card .c3 { font-weight: 700; font-size: 28px; line-height: 1.1; }
-  .card .c3 .en { font-family: var(--font-display); font-size: .7em; }
-  .card .c4 { font-size: 13px; font-weight: 500; opacity: .95; font-variant-numeric: tabular-nums; line-height: 1.4; }
-  .card .c4 .en { font-size: 1em; margin-left: .25em; }
-  .empty { color: var(--muted); font-size: 15px; line-height: 1.6; padding: 24px 4px; max-width: 46ch; }
-  .tbl-wrap { overflow-x: auto; border: 2px solid var(--line); border-radius: 12px; }
-  table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; min-width: 640px; }
-  th, td { padding: 8px 10px; text-align: center; font-size: 16px; border-bottom: 1px solid var(--line); white-space: nowrap; }
-  tbody tr:last-child td, tfoot tr:last-child td { border-bottom: 0; }
-  th { font-size: 13px; font-weight: 700; color: #fff; }
-  th .en { font-size: 1em; margin-left: .3em; }
-  th.r { background: var(--red); }
-  th.b { background: var(--blue); }
-  th.j, th.v { background: var(--surface); color: var(--muted); }
-  th.j { text-align: left; }
-  th.sub { font-weight: 500; }
-  td.j { text-align: left; font-weight: 700; }
-  td.j small { display: block; font-weight: 500; font-size: 12px; color: var(--muted); max-width: 12em; overflow: hidden; text-overflow: ellipsis; }
-  td.tot { font-weight: 700; font-family: var(--font-display); font-size: 20px; }
-  td.mid { border-left: 2px solid var(--line); }
-  td.na { color: var(--muted); }
-  td.vt { border-left: 2px solid var(--line); }
-  .vote { display: inline-block; min-width: 4.6em; padding: 3px 10px; border-radius: 999px; font-size: 13px; font-weight: 700; color: #fff; }
-  .vote .en { font-size: 1em; margin-left: .3em; }
-  .vote.r { background: var(--red); }
-  .vote.b { background: var(--blue); }
-  .vote.d { background: var(--muted); }
-  tfoot td { background: var(--surface); font-weight: 700; }
-  tfoot td.tot { font-size: 22px; }
-  .sec-title { font-size: 14px; font-weight: 700; color: var(--muted); letter-spacing: .03em; margin: 0 0 6px; }
-  .sec-title .en { font-size: 1em; margin-left: .3em; }
-  .log-wrap { overflow-x: auto; border: 2px solid var(--line); border-radius: 12px; max-height: 320px; overflow-y: auto; }
-  .log-wrap table { min-width: 620px; }
-  .log-wrap th { background: var(--surface); color: var(--muted); position: sticky; top: 0; }
-  .log-wrap td { font-size: 14px; padding: 6px 10px; }
-
-  /* Side by side: blue panel is the left-right mirror of the red panel */
+  /* Landscape: blue panel is the left-right mirror of red */
   @media (min-aspect-ratio: 5/4) {
     .panel.blue .head { flex-direction: row-reverse; }
     .panel.blue .who { align-items: flex-end; }
-    .panel.blue .chip-row { flex-direction: row-reverse; }
-    .panel.blue .sum { flex-direction: row-reverse; }
-    .panel.blue .tot-wrap { text-align: left; }
+    .panel.blue .chip-row, .panel.blue .sum { flex-direction: row-reverse; }
     .panel.blue .total { text-align: left; }
     .panel.blue .phases { grid-template-columns: 1fr 1.3fr; }
     .panel.blue .phase:nth-child(1) { order: 2; }
     .panel.blue .ph-head { flex-direction: row-reverse; }
-    .panel.blue .ph-label { text-align: right; }
     .panel.blue .foot .small:nth-child(1) { order: 2; }
   }
-  @media (prefers-reduced-motion: reduce) {
-    .total.bump { animation: none; }
-    .meter b, .big { transition: none; }
-  }
+  @media (prefers-reduced-motion: reduce) { .total.bump { animation: none; } .meter b, .big { transition: none; } }
 </style>
 
-<div class="bar-top">
-  <div class="field"><span>Judge</span>
-    <div class="seg" id="judge-seg" role="group" aria-label="Judge number">
-      <button type="button" data-slot="1" aria-pressed="false">1</button>
-      <button type="button" data-slot="2" aria-pressed="false">2</button>
-      <button type="button" data-slot="3" aria-pressed="false">3</button>
-      <button type="button" data-slot="4" aria-pressed="false">4</button>
-      <button type="button" data-slot="5" aria-pressed="false">5</button>
-    </div>
-  </div>
-  <label class="field"><input id="jname" type="text" placeholder="Judge name" maxlength="20" autocomplete="off" aria-label="Judge name"></label>
-  <h1>ITF TUL</h1>
-  <span class="grow"></span>
-  <div class="tabs" role="tablist" aria-label="View">
-    <button type="button" role="tab" id="tab-score" aria-selected="true">Scoring</button>
-    <button type="button" role="tab" id="tab-results" aria-selected="false">Results</button>
-  </div>
-  <div class="sync" id="sync" data-k="idle" aria-live="polite">
-    <span class="dot"></span><span id="sync-text">Auto-sends after Pattern 1</span>
-    <button class="btn mini" id="retry" type="button" hidden>Send</button>
-  </div>
-</div>
-
-<main id="board">
+<main>
   <section class="panel red" data-side="red" aria-label="Red">
     <div class="head">
       <div class="who">
-        <div class="chip-row">
-          <span class="chip">Red</span>
-          <label class="num"><span>No.</span> <input id="red-no" type="text" inputmode="numeric" maxlength="8" placeholder="#" autocomplete="off" aria-label="Red competitor number"></label>
-          <span class="tag" id="red-tag" hidden>⌀ Zero</span>
-          <span class="tag win" id="red-win" hidden>★ Win</span>
-        </div>
+        <div class="chip-row"><span class="chip">Red</span><span class="tag" id="red-tag" hidden>⌀ Zero</span><span class="tag" id="red-win" hidden>★ Win</span></div>
         <div class="sum">
           <div class="cell" id="red-c1"><small>P1</small><b id="red-s1">—</b></div>
           <div class="cell" id="red-c2"><small>P2</small><b id="red-s2">—</b></div>
-          <div class="cell sumc"><small>Total</small><b id="red-sum">0.0</b></div>
+          <div class="cell sumc"><small>Σ</small><b id="red-sum">0.0</b></div>
         </div>
       </div>
-      <div class="tot-wrap">
-        <div class="tot-label" id="red-tl">Pattern 1</div>
-        <div class="total" id="red-total" aria-live="polite">10.0</div>
-      </div>
+      <div class="total" id="red-total" aria-live="polite">10.0</div>
     </div>
     <div class="phases">
       <div class="phase">
-        <div class="ph-head">
-          <div class="ph-label">① Accuracy<small id="red-dn">−0.2 × 0</small></div>
-          <div class="ph-read"><span id="red-p1">6.0</span><small>/6.0</small></div>
-        </div>
+        <div class="ph-head"><div class="ph-label">① Accuracy</div><div class="ph-read" id="red-p1">6.0</div></div>
         <div class="meter"><b id="red-m1"></b></div>
         <button class="big deduct" type="button" data-act="ded" id="red-ded" aria-label="Red deduct 0.2">−0.2</button>
       </div>
       <div class="phase">
-        <div class="ph-head">
-          <div class="ph-label">② Performance<small id="red-an">+0.5 × 0</small></div>
-          <div class="ph-read"><span id="red-p2">0.0</span><small>/4.0</small></div>
-        </div>
+        <div class="ph-head"><div class="ph-label">② Perf.</div><div class="ph-read" id="red-p2">0.0</div></div>
         <div class="meter"><b id="red-m2"></b></div>
         <button class="big add" type="button" data-act="add" id="red-add" aria-label="Red add 0.5">+0.5</button>
       </div>
     </div>
     <div class="foot">
-      <button class="small st" type="button" data-act="undo" id="red-undo"><span>↶ Undo</span></button>
-      <button class="small zero st" type="button" data-act="zero" id="red-zero"></button>
+      <button class="small" type="button" data-act="undo" id="red-undo">↶ Undo</button>
+      <button class="small zero" type="button" data-act="zero" id="red-zero"></button>
     </div>
   </section>
 
-  <div class="mid" id="ctrl">
-    <button class="btn st" id="next" type="button"></button>
-    <button class="btn st" id="back" type="button" hidden></button>
+  <div class="mid">
+    <button class="btn" id="next" type="button"></button>
+    <button class="btn" id="back" type="button" hidden></button>
     <div class="result" id="result" hidden aria-live="polite"></div>
-    <button class="btn st" id="resetp" type="button"></button>
-    <button class="btn st" id="reset" type="button"></button>
-    <div class="stage" aria-hidden="true"><span id="st1"></span><span id="st2"></span><span id="st3"></span></div>
+    <button class="btn" id="resetp" type="button"></button>
+    <button class="btn" id="reset" type="button"></button>
   </div>
 
   <section class="panel blue" data-side="blue" aria-label="Blue">
     <div class="head">
       <div class="who">
-        <div class="chip-row">
-          <span class="chip">Blue</span>
-          <label class="num"><span>No.</span> <input id="blue-no" type="text" inputmode="numeric" maxlength="8" placeholder="#" autocomplete="off" aria-label="Blue competitor number"></label>
-          <span class="tag" id="blue-tag" hidden>⌀ Zero</span>
-          <span class="tag win" id="blue-win" hidden>★ Win</span>
-        </div>
+        <div class="chip-row"><span class="chip">Blue</span><span class="tag" id="blue-tag" hidden>⌀ Zero</span><span class="tag" id="blue-win" hidden>★ Win</span></div>
         <div class="sum">
           <div class="cell" id="blue-c1"><small>P1</small><b id="blue-s1">—</b></div>
           <div class="cell" id="blue-c2"><small>P2</small><b id="blue-s2">—</b></div>
-          <div class="cell sumc"><small>Total</small><b id="blue-sum">0.0</b></div>
+          <div class="cell sumc"><small>Σ</small><b id="blue-sum">0.0</b></div>
         </div>
       </div>
-      <div class="tot-wrap">
-        <div class="tot-label" id="blue-tl">Pattern 1</div>
-        <div class="total" id="blue-total" aria-live="polite">10.0</div>
-      </div>
+      <div class="total" id="blue-total" aria-live="polite">10.0</div>
     </div>
     <div class="phases">
       <div class="phase">
-        <div class="ph-head">
-          <div class="ph-label">① Accuracy<small id="blue-dn">−0.2 × 0</small></div>
-          <div class="ph-read"><span id="blue-p1">6.0</span><small>/6.0</small></div>
-        </div>
+        <div class="ph-head"><div class="ph-label">① Accuracy</div><div class="ph-read" id="blue-p1">6.0</div></div>
         <div class="meter"><b id="blue-m1"></b></div>
         <button class="big deduct" type="button" data-act="ded" id="blue-ded" aria-label="Blue deduct 0.2">−0.2</button>
       </div>
       <div class="phase">
-        <div class="ph-head">
-          <div class="ph-label">② Performance<small id="blue-an">+0.5 × 0</small></div>
-          <div class="ph-read"><span id="blue-p2">0.0</span><small>/4.0</small></div>
-        </div>
+        <div class="ph-head"><div class="ph-label">② Perf.</div><div class="ph-read" id="blue-p2">0.0</div></div>
         <div class="meter"><b id="blue-m2"></b></div>
         <button class="big add" type="button" data-act="add" id="blue-add" aria-label="Blue add 0.5">+0.5</button>
       </div>
     </div>
     <div class="foot">
-      <button class="small st" type="button" data-act="undo" id="blue-undo"><span>↶ Undo</span></button>
-      <button class="small zero st" type="button" data-act="zero" id="blue-zero"></button>
+      <button class="small" type="button" data-act="undo" id="blue-undo">↶ Undo</button>
+      <button class="small zero" type="button" data-act="zero" id="blue-zero"></button>
     </div>
   </section>
 </main>
 
-<section id="results" hidden aria-label="Five-judge results">
-  <div class="toolbar"><button class="btn" id="clear" type="button" hidden></button><span class="msg" id="clear-msg" aria-live="polite"></span></div>
-  <div class="bouts" id="courts"></div>
-  <div class="cards" id="cards"></div>
-  <div class="bouts" id="bouts"></div>
-  <div class="banner" id="banner"></div>
-  <div class="tbl-wrap" id="tbl-wrap"></div>
-  <div>
-    <h2 class="sec-title">Score log · one entry per finished pattern, newest first</h2>
-    <div class="log-wrap" id="log-wrap"></div>
-  </div>
-</section>
-
 <script>
 (function () {
-  var KEY = 'itf-tul-scoreboard-v3';
-  var JKEY = 'itf-tul-judge-v1';
-  var COURTS = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6'];
-  var MAX_D = 30;   // 6.0 / 0.2
-  var MAX_A = 8;    // 4.0 / 0.5
-  // Scores are tenths of a point (integers) to avoid floating-point drift.
+  var KEY = 'itf-tul-simple-v1';
+  var MAX_D = 30, MAX_A = 8;            // 6.0 / 0.2 and 4.0 / 0.5
+  // Scores are integer tenths of a point to avoid floating-point drift.
   var entry = function () { return { d: 0, a: 0, z: false, h: [] }; };
-  var fresh = function () {
-    return { stage: 1, redNo: '', blueNo: '', sent: { 1: false, 2: false },
-      red: { e: [entry(), entry()] }, blue: { e: [entry(), entry()] } };
-  };
+  var fresh = function () { return { stage: 1, red: [entry(), entry()], blue: [entry(), entry()] }; };
   var S = fresh();
-  var J = { slot: 0, name: '', court: '' };
-
-  var db = null, uid = null, isAdmin = false, clearing = false, canWrite = true, net = 'idle', errCode = '', syncing = false;
-  var ENT = [], LOG = [], selKey = null, selCourt = 'all', curCourt = 'all', view = 'score';
-
   var $ = function (id) { return document.getElementById(id); };
   var fmt = function (n) { return (n / 10).toFixed(1); };
-  var vib = function () { try { if (navigator.vibrate) navigator.vibrate(12); } catch (e) {} };
   var score = function (e) { return e.z ? 0 : 60 - 2 * e.d + 5 * e.a; };
-  var curIdx = function () { return S.stage === 3 ? 1 : S.stage - 1; };
-  var idPart = function (v) { return String(v || '').trim().replace(/[^A-Za-z0-9_.~:@+-]/g, '-').slice(0, 20); };
-  var num = function (v) { return (typeof v === 'number' && isFinite(v)) ? v : null; };
-  function el(tag, cls, txt) { var n = document.createElement(tag); if (cls) n.className = cls; if (txt != null) n.textContent = txt; return n; }
-  // Chinese text + smaller English beside it.
-  function bi(node, zh, en) { node.appendChild(document.createTextNode(en)); return node; }
-  function setSt(node, zh, en) { node.textContent = en; }
+  var idx = function () { return S.stage === 3 ? 1 : S.stage - 1; };
+  var vib = function () { try { if (navigator.vibrate) navigator.vibrate(12); } catch (e) {} };
+  var panel = function (side) { return document.querySelector('.panel[data-side="' + side + '"]'); };
 
-  /* ---------- local state ---------- */
-  function sanEntry(x) {
+  function clean(x) {
     var s = entry();
     if (!x || typeof x !== 'object') return s;
     s.d = Math.max(0, Math.min(MAX_D, x.d | 0));
@@ -520,533 +227,108 @@
     s.h = Array.isArray(x.h) ? x.h.filter(function (v) { return v === 'd' || v === 'a'; }).slice(-60) : [];
     return s;
   }
-  function sanSide(x) { var e = (x && Array.isArray(x.e)) ? x.e : []; return { e: [sanEntry(e[0]), sanEntry(e[1])] }; }
   try {
     var saved = JSON.parse(localStorage.getItem(KEY) || 'null');
     if (saved) {
       S.stage = Math.max(1, Math.min(3, saved.stage | 0)) || 1;
-      S.redNo = typeof saved.redNo === 'string' ? saved.redNo.slice(0, 8) : '';
-      S.blueNo = typeof saved.blueNo === 'string' ? saved.blueNo.slice(0, 8) : '';
-      S.sent = { 1: !!(saved.sent && saved.sent[1]), 2: !!(saved.sent && saved.sent[2]) };
-      S.red = sanSide(saved.red); S.blue = sanSide(saved.blue);
-    }
-    var sj = JSON.parse(localStorage.getItem(JKEY) || 'null');
-    if (sj) {
-      J.slot = Math.max(0, Math.min(5, sj.slot | 0));
-      J.name = typeof sj.name === 'string' ? sj.name.slice(0, 20) : '';
-      J.court = '';
+      ['red', 'blue'].forEach(function (k) { S[k] = [clean(saved[k] && saved[k][0]), clean(saved[k] && saved[k][1])]; });
     }
   } catch (e) {}
-  function persist() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
-  function persistJ() { try { localStorage.setItem(JKEY, JSON.stringify(J)); } catch (e) {} }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 
   function totals(side) {
-    var e = S[side].e, s1 = score(e[0]), s2 = S.stage >= 2 ? score(e[1]) : null;
+    var e = S[side], s1 = score(e[0]), s2 = S.stage >= 2 ? score(e[1]) : null;
     return { s1: s1, s2: s2, sum: s1 + (s2 === null ? 0 : s2) };
   }
 
-  /* ---------- scoring board render ---------- */
   function renderSide(side, bump) {
-    var idx = curIdx(), e = S[side].e[idx], locked = S.stage === 3, t = totals(side);
-    var cur = score(e), p1 = 60 - 2 * e.d, p2 = 5 * e.a;
-    var big = $(side + '-total');
-    big.textContent = fmt(locked ? t.sum : cur);
-    $(side + '-tl').textContent = locked ? 'Total of 2' : 'Pattern ' + (idx + 1);
+    var i = idx(), e = S[side][i], locked = S.stage === 3, t = totals(side);
+    var p1 = 60 - 2 * e.d, p2 = 5 * e.a, big = $(side + '-total');
+    big.textContent = fmt(locked ? t.sum : score(e));
     if (bump) { big.classList.remove('bump'); void big.offsetWidth; big.classList.add('bump'); }
     $(side + '-s1').textContent = fmt(t.s1);
     $(side + '-s2').textContent = t.s2 === null ? '—' : fmt(t.s2);
     $(side + '-sum').textContent = fmt(t.sum);
-    $(side + '-c1').classList.toggle('cur', !locked && idx === 0);
-    $(side + '-c2').classList.toggle('cur', !locked && idx === 1);
+    $(side + '-c1').classList.toggle('cur', !locked && i === 0);
+    $(side + '-c2').classList.toggle('cur', !locked && i === 1);
     $(side + '-p1').textContent = fmt(p1);
     $(side + '-p2').textContent = fmt(p2);
     $(side + '-m1').style.width = (p1 / 60 * 100) + '%';
     $(side + '-m2').style.width = (p2 / 40 * 100) + '%';
-    $(side + '-dn').textContent = '−0.2 × ' + e.d;
-    $(side + '-an').textContent = '+0.5 × ' + e.a;
     $(side + '-ded').disabled = locked || e.z || e.d >= MAX_D;
     $(side + '-add').disabled = locked || e.z || e.a >= MAX_A;
-    $(side + '-undo').disabled = locked || e.z || e.h.length === 0;
-    var z = $(side + '-zero');
-    if (e.z) setSt(z, '', '✕ Cancel zero'); else setSt(z, '', '⌀ Zero');
-    z.classList.toggle('on', e.z);
-    z.disabled = locked;
+    $(side + '-undo').disabled = locked || e.z || !e.h.length;
+    $(side + '-zero').textContent = e.z ? '✕ Cancel' : '⌀ Zero';
+    $(side + '-zero').classList.toggle('on', e.z);
+    $(side + '-zero').disabled = locked;
     $(side + '-tag').hidden = locked || !e.z;
-    var panel = document.querySelector('.panel[data-side="' + side + '"]');
-    panel.classList.toggle('zeroed', !locked && e.z);
-    panel.classList.toggle('locked', locked);
+    panel(side).classList.toggle('zeroed', !locked && e.z);
+    panel(side).classList.toggle('locked', locked);
   }
 
-  function renderCtrl() {
+  var rb = $('reset'), rpb = $('resetp'), timers = {};
+  function label() {
     var st = S.stage;
-    $('st1').className = 'st ' + (st === 1 ? 'on' : 'done');
-    $('st2').className = 'st ' + (st === 2 ? 'on' : (st > 2 ? 'done' : ''));
-    $('st3').className = 'st ' + (st === 3 ? 'on' : '');
-    var next = $('next'), back = $('back'), res = $('result');
-    next.hidden = st === 3;
-    if (st === 1) setSt(next, '', '✓ Finish pattern 1');
-    else setSt(next, '', '✓ Finish pattern 2');
-    back.hidden = st === 1;
-    if (st === 2) setSt(back, '', '← Pattern 1'); else setSt(back, '', '← Edit');
-    var rt = totals('red').sum, bt = totals('blue').sum;
-    var winner = st === 3 ? (rt > bt ? 'red' : (bt > rt ? 'blue' : 'tie')) : null;
-    res.hidden = st !== 3;
-    if (st === 3) {
+    $('next').textContent = st === 1 ? 'P1 ✓ →' : 'P2 ✓ Σ';
+    $('next').hidden = st === 3;
+    $('back').hidden = st === 1;
+    $('back').textContent = '← ' + (st === 2 ? 'P1' : 'Edit');
+    if (!rb.classList.contains('confirm')) rb.textContent = '↺ Round';
+    rpb.hidden = st === 3;
+    if (!rpb.classList.contains('confirm')) rpb.textContent = '↺ Pattern';
+  }
+  function renderCtrl() {
+    label();
+    var res = $('result'), rt = totals('red').sum, bt = totals('blue').sum;
+    var winner = S.stage === 3 ? (rt > bt ? 'red' : (bt > rt ? 'blue' : 'tie')) : null;
+    res.hidden = S.stage !== 3;
+    if (winner) {
       res.className = 'result ' + winner;
       res.textContent = '';
-      res.appendChild(el('div', null, 'My call'));
-      res.appendChild(el('div', null, winner === 'tie' ? 'Draw' : (winner === 'red' ? 'Red wins' : 'Blue wins')));
-      res.appendChild(el('div', 'rs', fmt(rt) + ' : ' + fmt(bt)));
+      var a = document.createElement('div'); a.textContent = winner === 'tie' ? '＝ Draw' : (winner === 'red' ? '★ Red wins' : '★ Blue wins');
+      var b = document.createElement('div'); b.className = 'rs'; b.textContent = fmt(rt) + ' : ' + fmt(bt);
+      res.appendChild(a); res.appendChild(b);
     }
     ['red', 'blue'].forEach(function (side) {
-      var isWin = winner === side;
-      $(side + '-win').hidden = !isWin;
-      document.querySelector('.panel[data-side="' + side + '"]').classList.toggle('win', isWin);
+      $(side + '-win').hidden = winner !== side;
+      panel(side).classList.toggle('win', winner === side);
     });
-    var jb = $('judge-seg').querySelectorAll('button');
-    for (var i = 0; i < jb.length; i++) jb[i].setAttribute('aria-pressed', String(+jb[i].getAttribute('data-slot') === J.slot));
-    if (!resetBtn.classList.contains('confirm')) setSt(resetBtn, '', '↺ Round');
-    resetpBtn.hidden = st === 3;
-    if (!resetpBtn.classList.contains('confirm')) setSt(resetpBtn, '', '↺ Pattern');
   }
+  function renderAll(bump) { renderSide('red', bump); renderSide('blue', bump); renderCtrl(); }
 
-  function renderInputs() {
-    if ($('red-no').value !== S.redNo) $('red-no').value = S.redNo;
-    if ($('blue-no').value !== S.blueNo) $('blue-no').value = S.blueNo;
-    if ($('jname').value !== J.name) $('jname').value = J.name;
-  }
-  function renderAll(bump) { renderSide('red', bump); renderSide('blue', bump); renderCtrl(); renderStatus(); }
-
-  /* ---------- sync status ---------- */
-  function pending() { return S.stage >= 2 && (!S.sent[1] || (S.stage >= 3 && !S.sent[2])); }
-  function missing() {
-    var m = [];
-    if (!J.slot) m.push('Judge');
-    if (!idPart(S.redNo)) m.push('Red No.');
-    if (!idPart(S.blueNo)) m.push('Blue No.');
-    return m;
-  }
-  function renderStatus() {
-    var k = 'idle', msg;
-    var p = pending(), miss = missing();
-    if (!db) { k = 'off'; msg = 'Offline · scores saved on this device only'; }
-    else if (!canWrite) { k = 'err'; msg = 'No write access · open as a collaborator'; }
-    else if (net === 'sending') { k = 'busy'; msg = 'Sending…'; }
-    else if (net === 'error') { k = 'err'; msg = 'Send failed' + (errCode ? ' (' + errCode + ')' : '') + ' · retry'; }
-    else if (p) { k = 'warn'; msg = 'Not sent' + (miss.length ? ' · fill: ' + miss.join(', ') : ''); }
-    else if (S.stage >= 2) { k = 'ok'; msg = 'Sent to results ✓'; }
-    else { msg = miss.length ? 'Fill first: ' + miss.join(', ') : 'Auto-sends after Pattern 1'; }
-    $('sync').setAttribute('data-k', k);
-    $('sync-text').textContent = msg;
-    $('sync').title = msg;
-    $('retry').hidden = !(db && canWrite && p && net !== 'sending');
-  }
-
-  /* ---------- upload ---------- */
-  async function sync() {
-    if (!db || !canWrite || syncing || !pending()) { renderStatus(); return; }
-    if (missing().length) { net = 'idle'; renderStatus(); return; }
-    syncing = true; net = 'sending'; renderStatus();
-    try {
-      var rn = idPart(S.redNo), bn = idPart(S.blueNo), now = Date.now();
-      var detail = function (side, i) { var e = S[side].e[i]; return { d: e.d, a: e.a, z: e.z }; };
-      for (var k = 1; k <= 2; k++) {
-        if (S.stage > k && !S.sent[k]) {
-          await db.collection('log').add({
-            ts: now, court: J.court, slot: J.slot, judge: J.name, uid: uid || '',
-            red: String(S.redNo).trim(), blue: String(S.blueNo).trim(), stage: k,
-            redScore: score(S.red.e[k - 1]), blueScore: score(S.blue.e[k - 1]),
-            redDetail: detail('red', k - 1), blueDetail: detail('blue', k - 1)
-          });
-          S.sent[k] = true; persist();
-        }
-      }
-      await db.doc('entries/' + rn + '_' + bn + '_j' + J.slot).set({
-        court: J.court, red: String(S.redNo).trim(), blue: String(S.blueNo).trim(), slot: J.slot, judge: J.name, uid: uid || '',
-        r1: score(S.red.e[0]), r2: S.stage >= 3 ? score(S.red.e[1]) : null,
-        b1: score(S.blue.e[0]), b2: S.stage >= 3 ? score(S.blue.e[1]) : null,
-        updatedAt: now
-      });
-      net = 'idle'; errCode = '';
-    } catch (e) {
-      net = 'error'; errCode = (e && e.code) || '';
-      if (errCode === 'invalid_argument') canWrite = false;
-    } finally {
-      syncing = false; renderStatus();
-    }
-  }
-
-  /* ---------- events: scoring ---------- */
   document.addEventListener('click', function (ev) {
     var btn = ev.target.closest('button[data-act]');
     if (!btn || S.stage === 3) return;
-    var side = btn.closest('.panel').getAttribute('data-side');
-    var e = S[side].e[curIdx()], act = btn.getAttribute('data-act');
+    var side = btn.closest('.panel').getAttribute('data-side'), e = S[side][idx()], act = btn.getAttribute('data-act');
     if (act === 'ded' && !e.z && e.d < MAX_D) { e.d++; e.h.push('d'); }
     else if (act === 'add' && !e.z && e.a < MAX_A) { e.a++; e.h.push('a'); }
-    else if (act === 'undo' && !e.z && e.h.length) { var last = e.h.pop(); if (last === 'd') e.d--; else e.a--; }
-    else if (act === 'zero') { e.z = !e.z; }
+    else if (act === 'undo' && !e.z && e.h.length) { if (e.h.pop() === 'd') e.d--; else e.a--; }
+    else if (act === 'zero') e.z = !e.z;
     else return;
-    vib(); persist(); renderSide(side, true); renderCtrl();
+    vib(); save(); renderSide(side, true); renderCtrl();
   });
 
-  $('next').addEventListener('click', function () {
-    if (S.stage >= 3) return;
-    S.stage++; vib(); persist(); renderAll(true); sync();
-  });
-  $('back').addEventListener('click', function () {
-    if (S.stage <= 1) return;
-    S.stage--;
-    for (var k = S.stage; k <= 2; k++) S.sent[k] = false;
-    vib(); persist(); renderAll(true);
-  });
+  $('next').addEventListener('click', function () { if (S.stage < 3) { S.stage++; vib(); save(); renderAll(true); } });
+  $('back').addEventListener('click', function () { if (S.stage > 1) { S.stage--; vib(); save(); renderAll(true); } });
 
-  var resetBtn = $('reset'), resetTimer = null;
-  resetBtn.addEventListener('click', function () {
-    if (!resetBtn.classList.contains('confirm')) {
-      resetBtn.classList.add('confirm'); setSt(resetBtn, '', 'Tap again ↺');
-      resetTimer = setTimeout(function () { resetBtn.classList.remove('confirm'); setSt(resetBtn, '', '↺ Round'); }, 3000);
-      return;
-    }
-    clearTimeout(resetTimer);
-    resetBtn.classList.remove('confirm');
-    S = fresh(); net = 'idle'; errCode = '';
-    persist(); renderInputs(); renderAll(true);
-  });
-
-  var resetpBtn = $('resetp'), resetpTimer = null;
-  resetpBtn.addEventListener('click', function () {
-    if (S.stage === 3) return;
-    if (!resetpBtn.classList.contains('confirm')) {
-      resetpBtn.classList.add('confirm'); setSt(resetpBtn, '', 'Tap again ↺');
-      resetpTimer = setTimeout(function () { resetpBtn.classList.remove('confirm'); setSt(resetpBtn, '', '↺ Pattern'); }, 3000);
-      return;
-    }
-    clearTimeout(resetpTimer);
-    resetpBtn.classList.remove('confirm');
-    var i = curIdx();
-    S.red.e[i] = entry(); S.blue.e[i] = entry();
-    vib(); persist(); renderAll(true);
-  });
-
-  /* ---------- events: court, judge, contestant fields ---------- */
-  $('judge-seg').addEventListener('click', function (ev) {
-    var b = ev.target.closest('button[data-slot]');
-    if (!b) return;
-    J.slot = +b.getAttribute('data-slot'); persistJ(); renderCtrl(); renderStatus(); sync();
-  });
-  $('jname').addEventListener('input', function (e) { J.name = e.target.value; persistJ(); });
-  ['red', 'blue'].forEach(function (side) {
-    var inp = $(side + '-no');
-    inp.addEventListener('input', function (e) { S[side + 'No'] = e.target.value; persist(); renderStatus(); });
-    inp.addEventListener('change', function () { sync(); });
-  });
-
-  /* ---------- results view ---------- */
-  function groupBouts() {
-    var m = {};
-    ENT.forEach(function (e) {
-      if (!e || typeof e !== 'object') return;
-      var slot = e.slot | 0;
-      if (slot < 1 || slot > 5) return;
-      var court = String(e.court == null ? '' : e.court);
-      var key = court + '|' + String(e.red) + '|' + String(e.blue);
-      var b = m[key] || (m[key] = { key: key, court: court, red: String(e.red), blue: String(e.blue), j: {}, t: 0 });
-      b.j[slot] = e;
-      b.t = Math.max(b.t, num(e.updatedAt) || 0);
-    });
-    return Object.keys(m).map(function (k) { return m[k]; }).sort(function (a, b) { return b.t - a.t; });
-  }
-  function f1(n) { return n === null ? '—' : (n / 10).toFixed(1); }
-  function avgCol(vals) {
-    var a = vals.filter(function (v) { return v !== null; });
-    if (!a.length) return null;
-    return a.reduce(function (x, y) { return x + y; }, 0) / a.length;
-  }
-  var courtZh = function (c) { return c ? 'Court ' + c : 'No court'; };
-  var courtEn = courtZh;
-
-  // Each finished judge casts one vote for the side with the higher two-pattern total (equal = draw).
-  function summarize(sel) {
-    var rows = [], reported = 0, complete = 0, sumR = 0, sumB = 0, vR = 0, vB = 0, vD = 0;
-    var c = { r1: [], r2: [], rs: [], b1: [], b2: [], bs: [] };
-    for (var s = 1; s <= 5; s++) {
-      var e = sel.j[s], row = { slot: s, e: e || null, vote: null };
-      if (e) {
-        reported++;
-        row.r1 = num(e.r1); row.r2 = num(e.r2); row.b1 = num(e.b1); row.b2 = num(e.b2);
-        row.done = row.r1 !== null && row.r2 !== null && row.b1 !== null && row.b2 !== null;
-        if (row.done) {
-          row.rs = row.r1 + row.r2; row.bs = row.b1 + row.b2;
-          complete++; sumR += row.rs; sumB += row.bs;
-          c.rs.push(row.rs); c.bs.push(row.bs);
-          if (row.rs > row.bs) { row.vote = 'r'; vR++; } else if (row.bs > row.rs) { row.vote = 'b'; vB++; } else { row.vote = 'd'; vD++; }
-        }
-        c.r1.push(row.r1); c.r2.push(row.r2); c.b1.push(row.b1); c.b2.push(row.b2);
+  // Reset buttons need a second tap within 3 s.
+  function armed(btn, text, run) {
+    btn.addEventListener('click', function () {
+      if (!btn.classList.contains('confirm')) {
+        btn.classList.add('confirm'); btn.textContent = 'Tap again ↺';
+        timers[btn.id] = setTimeout(function () { btn.classList.remove('confirm'); label(); }, 3000);
+        return;
       }
-      rows.push(row);
-    }
-    return { rows: rows, reported: reported, complete: complete, sumR: sumR, sumB: sumB, vR: vR, vB: vB, vD: vD, c: c };
-  }
-
-  // Majority of judges decides: 3 of 5 votes wins at once; otherwise the side ahead "leads" until all five finish.
-  function verdict(m) {
-    if (!m.complete) return { cls: '', en: 'In progress', es: m.reported + '/5 judges reported, waiting for Pattern 2' };
-    var side, en;
-    var winE = function (s) { return s === 'red' ? 'Red wins' : 'Blue wins'; };
-    if (m.vR >= 3 || m.vB >= 3) { side = m.vR >= 3 ? 'red' : 'blue'; en = winE(side); }
-    else if (m.complete === 5) {
-      if (m.vR === m.vB) { side = 'tie'; en = 'Draw'; }
-      else { side = m.vR > m.vB ? 'red' : 'blue'; en = winE(side); }
-    } else if (m.vR === m.vB) { side = 'tie'; en = 'Level so far'; }
-    else { side = m.vR > m.vB ? 'red' : 'blue'; en = side === 'red' ? 'Red leads' : 'Blue leads'; }
-    var avg = (m.sumR / 10 / m.complete).toFixed(2) + ' : ' + (m.sumB / 10 / m.complete).toFixed(2);
-    var es = 'Votes ' + m.vR + ' : ' + m.vB + (m.vD ? ' (' + m.vD + ' draw)' : '') + ' · ' + m.complete + '/5 judges done · Avg ' + avg;
-    if (side === 'tie' && m.complete === 5) es += ' · Referee decides';
-    return { cls: side, en: en, es: es };
-  }
-
-  function renderClear() {
-    var b = $('clear');
-    b.hidden = !(db && isAdmin);
-    if (clearing || b.classList.contains('confirm')) return;
-    if (curCourt === 'all') setSt(b, '', '✕ Clear all results');
-    else setSt(b, '' + courtZh(curCourt) + '', '✕ Clear ' + courtEn(curCourt) + ' results');
-  }
-  var clearTimer = null;
-  $('clear').addEventListener('click', async function () {
-    var b = $('clear');
-    if (clearing || !db) return;
-    if (!b.classList.contains('confirm')) {
-      b.classList.add('confirm'); setSt(b, '', 'Tap again ✕');
-      clearTimer = setTimeout(function () { b.classList.remove('confirm'); renderClear(); }, 4000);
-      return;
-    }
-    clearTimeout(clearTimer); b.classList.remove('confirm');
-    clearing = true; setSt(b, '', 'Clearing…');
-    var msg = $('clear-msg'), court = curCourt, n = 0;
-    msg.textContent = '';
-    try {
-      var names = ['entries', 'log'];
-      for (var k = 0; k < names.length; k++) {
-        for (var round = 0; round < 40; round++) {
-          var snap = await db.collection(names[k]).limit(1000).get();
-          var docs = snap.docs.filter(function (d) {
-            if (court === 'all') return true;
-            var x = d.data() || {};
-            return String(x.court == null ? '' : x.court) === court;
-          });
-          if (!docs.length) break;
-          for (var i = 0; i < docs.length; i++) { await db.doc(names[k] + '/' + docs[i].id).delete(); n++; }
-        }
-      }
-      msg.textContent = 'Cleared ' + n + ' entr' + (n === 1 ? 'y' : 'ies');
-    } catch (e) {
-      msg.textContent = 'Clear failed' + (e && e.code ? '(' + e.code + ')' : '');
-    } finally {
-      clearing = false; renderClear();
-    }
-  });
-
-  function renderResults() { renderResultsInner(); renderClear(); }
-
-  function renderResultsInner() {
-    var courtsEl = $('courts'), boutsEl = $('bouts'), cardsEl = $('cards'), banner = $('banner'), wrap = $('tbl-wrap');
-    courtsEl.textContent = ''; boutsEl.textContent = ''; cardsEl.textContent = ''; wrap.textContent = ''; banner.textContent = '';
-    courtsEl.hidden = true; boutsEl.hidden = true; cardsEl.hidden = true; wrap.hidden = true; banner.hidden = false;
-    banner.className = 'banner';
-    var all = groupBouts();
-
-    if (!db) {
-      banner.appendChild(bi(el('div', 'b2'), '', 'Not connected to the shared database. Open this page signed in on claude.ai.'));
-      curCourt = 'all'; renderLog(); return;
-    }
-    if (!all.length) {
-      banner.appendChild(bi(el('div', 'b1'), '', 'Waiting for judges'));
-      banner.appendChild(bi(el('div', 'b2'), '', 'Results appear here after judges finish Pattern 1 on the Scoring screen.'));
-      curCourt = 'all'; renderLog(); return;
-    }
-
-    var courts = [];
-    all.forEach(function (b) { if (courts.indexOf(b.court) < 0) courts.push(b.court); });
-    courts.sort(function (a, b) { return (COURTS.indexOf(a) + 99) % 99 - (COURTS.indexOf(b) + 99) % 99 || (a < b ? -1 : 1); });
-    var cur = selCourt;
-    if (cur !== 'all' && courts.indexOf(cur) < 0) cur = 'all';
-    if (cur === 'all' && courts.length === 1) cur = courts[0];
-    curCourt = cur;
-
-    if (courts.length > 1) {
-      courtsEl.hidden = false;
-      courtsEl.appendChild(bi(el('span', 'lbl'), '', 'Court'));
-      var mk = function (zh, en, val) {
-        var btn = bi(el('button', 'bout'), zh, en); btn.type = 'button';
-        btn.setAttribute('aria-pressed', String(cur === val));
-        btn.addEventListener('click', function () { selCourt = val; selKey = null; renderResults(); });
-        courtsEl.appendChild(btn);
-      };
-      mk('', 'All courts', 'all');
-      courts.forEach(function (ct) { mk('', ct || 'No court', ct); });
-    }
-
-    if (cur === 'all') {
-      banner.hidden = true; cardsEl.hidden = false;
-      courts.forEach(function (ct) {
-        var b = all.filter(function (x) { return x.court === ct; })[0];
-        var v = verdict(summarize(b));
-        var card = el('button', 'card ' + v.cls); card.type = 'button';
-        card.appendChild(bi(el('div', 'c1'), courtZh(ct), courtEn(ct)));
-        card.appendChild(el('div', 'c2', 'Red #' + b.red + ' vs Blue #' + b.blue));
-        card.appendChild(bi(el('div', 'c3'), v.zh, v.en));
-        card.appendChild(el('div', 'c4', v.es));
-        card.addEventListener('click', function () { selCourt = ct; selKey = null; renderResults(); });
-        cardsEl.appendChild(card);
-      });
-      renderLog(); return;
-    }
-
-    var list = all.filter(function (b) { return b.court === cur; });
-    var sel = list[0];
-    for (var i = 0; i < list.length; i++) if (list[i].key === selKey) sel = list[i];
-    boutsEl.hidden = false; wrap.hidden = false;
-    boutsEl.appendChild(bi(el('span', 'lbl'), '', 'Match'));
-    list.slice(0, 12).forEach(function (b) {
-      var btn = el('button', 'bout', 'Red #' + b.red + ' vs Blue #' + b.blue);
-      btn.type = 'button';
-      btn.setAttribute('aria-pressed', String(b.key === sel.key));
-      btn.addEventListener('click', function () { selKey = b.key; renderResults(); });
-      boutsEl.appendChild(btn);
+      clearTimeout(timers[btn.id]); btn.classList.remove('confirm'); run(); save(); renderAll(true);
     });
-
-    var m = summarize(sel), v = verdict(m);
-    banner.className = 'banner ' + v.cls;
-    banner.appendChild(bi(el('div', 'b1'), v.zh, v.en));
-    banner.appendChild(el('div', 'b2', courtZh(sel.court) + ' · Red #' + sel.red + ' vs Blue #' + sel.blue));
-    banner.appendChild(el('div', 'b2', v.es));
-
-    var t = el('table');
-    var thead = el('thead');
-    var h1 = el('tr');
-    h1.appendChild(Object.assign(bi(el('th', 'j'), '', 'Judge'), { rowSpan: 2 }));
-    h1.appendChild(Object.assign(bi(el('th', 'r'), '', 'Red #' + sel.red), { colSpan: 3 }));
-    h1.appendChild(Object.assign(bi(el('th', 'b'), '', 'Blue #' + sel.blue), { colSpan: 3 }));
-    h1.appendChild(Object.assign(bi(el('th', 'v'), '', 'Vote'), { rowSpan: 2 }));
-    thead.appendChild(h1);
-    var h2 = el('tr');
-    [['r', '', 'P1'], ['r', '', 'P2'], ['r', '', 'Total'], ['b', '', 'P1'], ['b', '', 'P2'], ['b', '', 'Total']]
-      .forEach(function (x) { h2.appendChild(bi(el('th', x[0] + ' sub'), x[1], x[2])); });
-    thead.appendChild(h2);
-    t.appendChild(thead);
-
-    var tb = el('tbody');
-    m.rows.forEach(function (r) {
-      var tr = el('tr');
-      var jc = el('td', 'j', 'Judge ' + r.slot);
-      if (r.e && r.e.judge) jc.appendChild(el('small', null, String(r.e.judge)));
-      tr.appendChild(jc);
-      var vals = r.e ? [r.r1, r.r2, r.done ? r.rs : null, r.b1, r.b2, r.done ? r.bs : null] : [null, null, null, null, null, null];
-      vals.forEach(function (x, i) {
-        tr.appendChild(el('td', (i === 2 || i === 5 ? 'tot ' : '') + (i === 3 ? 'mid ' : '') + (x === null ? 'na' : ''), f1(x)));
-      });
-      var vt = el('td', 'vt');
-      if (r.vote === 'r') vt.appendChild(bi(el('span', 'vote r'), '', 'Red'));
-      else if (r.vote === 'b') vt.appendChild(bi(el('span', 'vote b'), '', 'Blue'));
-      else if (r.vote === 'd') vt.appendChild(bi(el('span', 'vote d'), '', 'Draw'));
-      else { vt.textContent = r.e ? '…' : '—'; vt.className = 'vt na'; }
-      tr.appendChild(vt);
-      tb.appendChild(tr);
-    });
-    t.appendChild(tb);
-
-    var tf = el('tfoot'), fr = el('tr');
-    fr.appendChild(bi(el('td', 'j'), '', 'Average'));
-    [m.c.r1, m.c.r2, m.c.rs, m.c.b1, m.c.b2, m.c.bs].forEach(function (arr, i) {
-      var a = avgCol(arr);
-      fr.appendChild(el('td', (i === 2 || i === 5 ? 'tot ' : '') + (i === 3 ? 'mid' : ''), a === null ? '—' : (a / 10).toFixed(2)));
-    });
-    fr.appendChild(el('td', 'tot vt', m.vR + ' : ' + m.vB));
-    tf.appendChild(fr); t.appendChild(tf);
-    wrap.appendChild(t);
-    renderLog();
   }
+  armed(rb, '↺ Round', function () { S = fresh(); });
+  armed(rpb, '↺ Pattern', function () { var i = idx(); S.red[i] = entry(); S.blue[i] = entry(); });
 
-  function renderLog() {
-    var w = $('log-wrap');
-    w.textContent = '';
-    var list = curCourt === 'all' ? LOG : LOG.filter(function (r) { return String(r.court == null ? '' : r.court) === curCourt; });
-    if (!list.length) { w.appendChild(bi(el('div', 'empty'), db ? '' : '', db ? 'No entries yet.' : 'Every submitted score is listed here once connected.')); return; }
-    var t = el('table'), th = el('thead'), tr = el('tr');
-    [['', 'Time'], ['', 'Court'], ['', 'Judge'], ['', 'Red'], ['', 'Blue'], ['', 'Pattern'], ['', 'Red pts'], ['', 'Blue pts']]
-      .forEach(function (x) { tr.appendChild(bi(el('th'), x[0], x[1])); });
-    th.appendChild(tr); t.appendChild(th);
-    var tb = el('tbody');
-    list.forEach(function (r) {
-      var d = new Date(num(r.ts) || 0), row = el('tr');
-      var time = (d.getMonth() + 1) + '/' + d.getDate() + ' ' + ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2) + ':' + ('0' + d.getSeconds()).slice(-2);
-      [time, r.court || '—', (r.slot | 0) + (r.judge ? ' ' + r.judge : ''), r.red, r.blue, 'P' + (r.stage | 0), f1(num(r.redScore)), f1(num(r.blueScore))]
-        .forEach(function (x) { row.appendChild(el('td', null, String(x == null ? '' : x))); });
-      tb.appendChild(row);
-    });
-    t.appendChild(tb); w.appendChild(t);
-  }
-
-  /* ---------- view tabs ---------- */
-  function showView(v) {
-    view = v;
-    var score_ = v === 'score';
-    $('board').hidden = !score_; $('ctrl').hidden = !score_; $('results').hidden = score_;
-    $('tab-score').setAttribute('aria-selected', String(score_));
-    $('tab-results').setAttribute('aria-selected', String(!score_));
-    if (!score_) renderResults();
-  }
-  $('tab-score').addEventListener('click', function () { showView('score'); });
-  $('tab-results').addEventListener('click', function () { showView('results'); });
-  $('retry').addEventListener('click', function () { net = 'idle'; sync(); });
-
-  /* ---------- boot ---------- */
-  renderInputs();
   renderAll(false);
-  showView((location.hash || '').replace('#', '') === 'results' ? 'results' : 'score');
 
-  (async function () {
-    try {
-      if (window.claude && window.claude.use) {
-        var u = await window.claude.use('user');
-        if (u) {
-          uid = await u.id();
-          isAdmin = (await u.canEdit()) || (await u.isOwner());
-          var w = await u.can('data.write');
-          if (w === false) canWrite = false;
-        }
-        db = await window.claude.use('db');
-      }
-    } catch (e) { db = null; }
-    if (db) {
-      try {
-        db.collection('entries').limit(1000).onSnapshot(function (snap) {
-          ENT = snap.docs.map(function (d) { return d.data(); }); if (view === 'results') renderResults();
-        }, function () {});
-        db.collection('log').orderBy('ts', 'desc').limit(100).onSnapshot(function (snap) {
-          LOG = snap.docs.map(function (d) { return d.data(); }); if (view === 'results') renderLog();
-        }, function () {});
-      } catch (e) {}
-    }
-    renderStatus();
-    if (view === 'results') renderResults();
-    sync();
-  })();
-
-  // keep the screen on while scoring (optional, may be refused)
-  var lock = null;
-  function wake() {
-    try {
-      if (navigator.wakeLock && document.visibilityState === 'visible') {
-        navigator.wakeLock.request('screen').then(function (l) { lock = l; }).catch(function () {});
-      }
-    } catch (e) {}
-  }
-  document.addEventListener('visibilitychange', wake);
-  wake();
+  // keep the screen on while scoring (optional)
+  function wake() { try { if (navigator.wakeLock && document.visibilityState === 'visible') navigator.wakeLock.request('screen').catch(function () {}); } catch (e) {} }
+  document.addEventListener('visibilitychange', wake); wake();
 })();
 </script>
-
-</body></html>
